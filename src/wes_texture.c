@@ -64,7 +64,7 @@ glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, G
     GLvoid* data = (GLvoid*) pixels;
 
     /* conversion routines */
-    if (format == GL_BGR){
+	if (format == GL_BGR){
         data = (GLvoid*) malloc(width * height * 3);
         wes_convert_BGR2RGB((GLubyte*) pixels, (GLubyte*) data, width * height * 3);
         format = GL_RGB;
@@ -76,13 +76,25 @@ glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, G
         data = (GLvoid*) malloc(width * height * 2);
         wes_convert_I2LA((GLubyte*) pixels, (GLubyte*) data, width * height * 2);
         format = GL_LUMINANCE_ALPHA;
-    }
+	}
 
     wes_gl->glTexImage2D(target, level, format, width, height, 0, format, type, data);
 
     if (data != pixels)
         free(data);
 }
+
+GLvoid glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+{
+	wes_gl->glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
+}
+
+
+void glCopyTexImage2D( GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border )
+{
+	wes_gl->glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
+}
+
 
 GLvoid
 wes_halveimage(GLint nw, GLint nh, GLint byteperpixel, char* data, char* newdata)

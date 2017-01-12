@@ -330,7 +330,7 @@ wes_shader_init()
     sh_program_mod = GL_TRUE;
 
     //Load file into mem:
-    file = fopen("WES.vsh", "rb");
+    file = fopen("/mnt/data/xash/WES.vsh", "rb");
 	if (!file){
 	    PRINT_ERROR("Could not find file: %s", "WES.vsh");
 	}

@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes_shader.h"
 #include "wes_matrix.h"
 #include "wes_begin.h"
-#include "wes_gl_arb.h"
+//#include "wes_gl_arb.h"
 
 #ifdef LOGSTATE
 #define UpdateUniform1i(A)                                          \
@@ -366,11 +366,12 @@ wes_name_envfunc(GLint param)
         case GL_SUBTRACT:       return "WES_FUNC_SUBTRACT";
         case GL_DOT3_RGB:       return "WES_FUNC_DOT3_RGB";
         case GL_DOT3_RGBA:      return "WES_FUNC_DOT3_RGBA";
-
+#if 0
         /* ATI Extensions */
         case GL_MODULATE_ADD_ATI:           return "WES_FUNC_MODULATE_ADD";
         case GL_MODULATE_SIGNED_ADD_ATI:    return "WES_FUNC_MODULATE_SIGNED_ADD";
         case GL_MODULATE_SUBTRACT_ATI:      return "WES_FUNC_MODULATE_SUBTRACT";
+#endif
     }
     return "ERROR";
 }
@@ -391,11 +392,13 @@ wes_index_envfunc(GLint param)
         case GL_SUBTRACT:       return WES_FUNC_SUBTRACT;
         case GL_DOT3_RGB:       return WES_FUNC_DOT3_RGB;
         case GL_DOT3_RGBA:      return WES_FUNC_DOT3_RGBA;
+#if 0
 
         /* ATI Extensions */
         case GL_MODULATE_ADD_ATI:           return WES_FUNC_MODULATE_ADD;
         case GL_MODULATE_SIGNED_ADD_ATI:    return WES_FUNC_MODULATE_SIGNED_ADD;
         case GL_MODULATE_SUBTRACT_ATI:      return WES_FUNC_MODULATE_SUBTRACT;
+#endif
 
         default:                return 0;
     }

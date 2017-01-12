@@ -531,7 +531,7 @@ wes_frag_tex(char* buff, progstate_t *s)
                     break;
 
                 case WES_FUNC_MODULATE:
-                    str += sprintf(str, "gl_FragColor *= tex%i;\n", i);
+					str += sprintf(str, "gl_FragColor = tex%i;\n", i);
                     break;
 
                 case WES_FUNC_DECAL:

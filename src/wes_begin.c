@@ -245,6 +245,41 @@ glVertex3f(GLfloat x, GLfloat y, GLfloat z)
 }
 
 GLvoid
+glVertex3fv(GLfloat *v)
+{
+	return glVertex3f(v[0], v[1], v[2]);
+}
+
+GLvoid glBlendFunc(GLenum sfactor, GLenum dfactor)
+{
+	wes_vertbuffer_flush();
+	wes_gl->glBlendFunc(sfactor, dfactor);
+}
+
+GLvoid glDepthMask( GLboolean flag )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glDepthMask( flag );
+}
+
+GLvoid glTexEnvf (GLenum target, GLenum pname, GLfloat param)
+{
+	return;
+}
+
+GLvoid glShadeModel (GLenum mode)
+{
+	return;
+}
+
+GLvoid glPointSize( GLfloat size )
+{
+
+}
+
+
+
+GLvoid
 glVertex2f(GLfloat x, GLfloat y)
 {
     if (vt_possize > 2) {
@@ -407,6 +442,11 @@ glColor4ub(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
     vt_current->cg0 = (GLfloat)g * ubtofloat;
     vt_current->cb0 = (GLfloat)b * ubtofloat;
     vt_current->ca0 = (GLfloat)a * ubtofloat;
+}
+
+GLvoid glColor4ubv( const GLubyte *v )
+{
+	glColor4ub(v[0], v[1], v[2], v[3]);
 }
 
 GLvoid
@@ -749,3 +789,227 @@ glDrawArrays(GLenum mode, GLint off, GLint num)
     wes_gl->glDrawArrays(mode, off, num);
 }
 
+void glDepthRange(GLclampf zNear, GLclampf zFar)
+{
+	wes_gl->glDepthRangef( zNear, zFar );
+}
+
+void glDepthFunc (GLenum func)
+{
+	wes_vertbuffer_flush();
+	wes_gl->glDepthFunc( func );
+}
+
+GLvoid glFinish()
+{
+	wes_state_update();
+}
+
+GLvoid glPolygonMode()
+{
+
+}
+
+GLvoid glPolygonOffset( GLfloat factor, GLfloat units )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glPolygonOffset(factor, units);
+}
+
+GLvoid glDrawElements( GLenum mode, GLsizei count, GLenum type, const GLvoid *indices )
+{
+	wes_vertbuffer_flush();
+	wes_gl->glDrawElements(mode, count, type, indices);
+}
+
+GLvoid glClearColor (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+{
+	wes_vertbuffer_flush();
+	wes_gl->glClearColor(red,green,blue,alpha);
+}
+
+GLenum glGetError()
+{
+	return wes_gl->glGetError();//GL_NO_ERROR;
+}
+
+GLvoid glLineWidth( GLfloat width ) {}
+
+GLvoid glTexParameteri (GLenum target, GLenum pname, GLint param)
+{
+	if (pname == 0x1004) { // GL_TEXTURE_BORDER_COLOR
+		return; // not supported by opengl es
+	}
+	if (    (pname == GL_TEXTURE_WRAP_S ||
+			 pname == GL_TEXTURE_WRAP_T) &&
+			 param == 0x2900)   { // GL_CLAMP
+		param = 0x812F;
+	}
+
+	wes_vertbuffer_flush();
+	wes_gl->glTexParameteri(target, pname, param);
+}
+
+void glArrayElement(GLint i) {}
+void glCallList( GLuint list ) {}
+void glColorMask( GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha ) {}
+void glStencilFunc( GLenum func, GLint ref, GLuint mask ) {}
+void glStencilOp( GLenum fail, GLenum zfail, GLenum zpass ) {}
+void glStencilMask( GLuint mask ) {}
+void glClearStencil( GLint s ) {}
+
+GLubyte nano_extensions_string[4096];
+const GLubyte* glGetString (GLenum name)
+	{
+
+	if (name == GL_EXTENSIONS)
+		{
+#if defined(__MULTITEXTURE_SUPPORT__)
+		sprintf((char*)nano_extensions_string,"%s %s",wes_gl->glGetString(name),"GL_ARB_multitexture EXT_texture_env_add");
+#else
+		sprintf((char*)nano_extensions_string,"%s %s",wes_gl->glGetString(name),"EXT_texture_env_add");
+#endif
+		return nano_extensions_string;
+		}
+	return wes_gl->glGetString(name);
+	}
+
+void glGetIntegerv (GLenum pname, GLint *params)
+	{
+	wes_gl->glGetIntegerv(pname, params);
+	}
+
+void glGetFloatv (GLenum pname, GLfloat *params)
+	{
+	wes_gl->glGetFloatv(pname, params);
+	}
+
+void glHint(GLenum target, GLenum mode)
+{
+	wes_vertbuffer_flush();
+	wes_gl->glHint(target, mode);
+}
+
+void glReadPixels (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels)
+	{
+	if (format == GL_DEPTH_COMPONENT)
+		{
+		// OpenglEs 1.1 does not support reading depth buffer without an extension
+		memset(pixels, 0xff,4);
+		return;
+		}
+	wes_vertbuffer_flush();
+	wes_gl->glReadPixels(x,y,width,height,format,type,pixels);
+	}
+
+void glNormal3fv( const GLfloat *v )
+	{
+	glNormal3f( v[0], v[1], v[2] );
+	}
+
+void glCullFace (GLenum mode)
+{
+	wes_vertbuffer_flush();
+	wes_gl->glCullFace(mode);
+}
+
+void glFrontFace (GLenum mode)
+{
+	wes_vertbuffer_flush();
+	wes_gl->glFrontFace(mode);
+}
+#define glEsImpl wes_gl
+#define FlushOnStateChange() wes_vertbuffer_flush()
+void glPixelStorei (GLenum pname, GLint param)
+{
+	FlushOnStateChange();
+	glEsImpl->glPixelStorei(pname, param);
+}
+
+
+void glClear (GLbitfield mask)
+	{
+	FlushOnStateChange();
+	glEsImpl->glClear(mask);
+	}
+
+void glOrtho (GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat zNear, GLfloat zFar)
+	{
+//	FlushOnStateChange();
+	}
+
+GLboolean glIsTexture(GLuint texture)
+	{
+	//FlushOnStateChange();
+	return glEsImpl->glIsTexture(texture);
+	}
+
+void glDrawBuffer(GLenum mode)
+	{
+	}
+void glViewport (GLint x, GLint y, GLsizei width, GLsizei height)
+	{
+	FlushOnStateChange();
+	glEsImpl->glViewport(x,y,width,height);
+	}
+
+void glBindTexture (GLenum target, GLuint texture)
+	{
+	glEsImpl->glBindTexture(target, texture);
+	}
+
+void glTexParameterf (GLenum target, GLenum pname, GLfloat param)
+	{
+	if (pname == 0x1004) { // GL_TEXTURE_BORDER_COLOR
+		return; // not supported by opengl es
+	}
+	if (    (pname == GL_TEXTURE_WRAP_S ||
+			 pname == GL_TEXTURE_WRAP_T) &&
+			 param == 0x2900)   { // GL_CLAMP
+		param = 0x812F;
+	}
+
+	FlushOnStateChange();
+	glEsImpl->glTexParameterf(target, pname,param);
+	}
+
+void glTexParameterfv(	GLenum target, GLenum pname, const GLfloat *params)
+	{
+	glTexParameterf(target, pname, params[0]);
+	}
+
+void glTexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+	{
+	glTexImage2D(GL_TEXTURE_2D, level, internalformat,  width, 1, border, format, type, pixels);
+	}
+
+void glTexImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+	{
+	glTexImage2D(GL_TEXTURE_2D, level, internalformat,  width, height, border, format, type, pixels);
+	}
+void glTexSubImage1D( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels )
+	{
+	glTexSubImage2D(target,level,xoffset,0,width,1,format,type,pixels);
+	}
+
+void glTexSubImage3D( GLenum target, GLint level,
+										 GLint xoffset, GLint yoffset,
+										 GLint zoffset, GLsizei width,
+										 GLsizei height, GLsizei depth,
+										 GLenum format,
+										 GLenum type, const GLvoid *pixels)
+	{
+	glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
+	}
+
+void glDeleteTextures( GLsizei n, const GLuint *textures )
+	{
+	FlushOnStateChange();
+	glEsImpl->glDeleteTextures(n,textures);
+	}
+
+void nanoGL_Init()
+{
+	//wes_init("libGLESv2.so");
+	//wes_shader_init();
+}
