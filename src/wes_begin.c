@@ -253,18 +253,15 @@ glVertex3fv(GLfloat *v)
 GLvoid glBlendFunc(GLenum sfactor, GLenum dfactor)
 {
 	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glBlendFunc(sfactor, dfactor);
 }
 
 GLvoid glDepthMask( GLboolean flag )
 {
 	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glDepthMask( flag );
-}
-
-GLvoid glTexEnvf (GLenum target, GLenum pname, GLfloat param)
-{
-	return;
 }
 
 GLvoid glShadeModel (GLenum mode)
@@ -416,7 +413,7 @@ glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     vt_current->cr0 = r;
     vt_current->cg0 = g;
     vt_current->cb0 = b;
-    vt_current->ca0 = a;
+	vt_current->ca0 = a;
 }
 
 GLvoid
@@ -428,7 +425,7 @@ glColor3f(GLfloat r, GLfloat g, GLfloat b)
         vt_color0size = 3;
         vt_current->cr0 = r;
         vt_current->cg0 = g;
-        vt_current->cb0 = b;
+		vt_current->cb0 = b;
     }
 }
 
@@ -441,7 +438,7 @@ glColor4ub(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
     vt_current->cr0 = (GLfloat)r * ubtofloat;
     vt_current->cg0 = (GLfloat)g * ubtofloat;
     vt_current->cb0 = (GLfloat)b * ubtofloat;
-    vt_current->ca0 = (GLfloat)a * ubtofloat;
+	vt_current->ca0 = (GLfloat)a * ubtofloat;
 }
 
 GLvoid glColor4ubv( const GLubyte *v )
@@ -458,7 +455,7 @@ glColor3ub(GLubyte r, GLubyte g, GLubyte b)
         vt_color0size = 3;
         vt_current->cr0 = (GLfloat)r * ubtofloat;
         vt_current->cg0 = (GLfloat)g * ubtofloat;
-        vt_current->cb0 = (GLfloat)b * ubtofloat;
+		vt_current->cb0 = (GLfloat)b * ubtofloat;
     }
 }
 
@@ -475,7 +472,7 @@ glSecondaryColor3f(GLfloat r, GLfloat g, GLfloat b){
 GLvoid
 glEnd()
 {
-    //wes_vertbuffer_flush();
+	wes_vertbuffer_flush();
 }
 
 GLvoid
@@ -791,17 +788,21 @@ glDrawArrays(GLenum mode, GLint off, GLint num)
 
 void glDepthRange(GLclampf zNear, GLclampf zFar)
 {
+	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glDepthRangef( zNear, zFar );
 }
 
 void glDepthFunc (GLenum func)
 {
 	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glDepthFunc( func );
 }
 
 GLvoid glFinish()
 {
+	wes_vertbuffer_flush();
 	wes_state_update();
 }
 
@@ -819,12 +820,15 @@ GLvoid glPolygonOffset( GLfloat factor, GLfloat units )
 GLvoid glDrawElements( GLenum mode, GLsizei count, GLenum type, const GLvoid *indices )
 {
 	wes_vertbuffer_flush();
+	glClientActiveTexture( GL_TEXTURE0 );
+	wes_state_update();
 	wes_gl->glDrawElements(mode, count, type, indices);
 }
 
 GLvoid glClearColor (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
 {
 	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glClearColor(red,green,blue,alpha);
 }
 
@@ -847,6 +851,7 @@ GLvoid glTexParameteri (GLenum target, GLenum pname, GLint param)
 	}
 
 	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glTexParameteri(target, pname, param);
 }
 
@@ -887,6 +892,7 @@ void glGetFloatv (GLenum pname, GLfloat *params)
 void glHint(GLenum target, GLenum mode)
 {
 	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glHint(target, mode);
 }
 
@@ -910,16 +916,18 @@ void glNormal3fv( const GLfloat *v )
 void glCullFace (GLenum mode)
 {
 	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glCullFace(mode);
 }
 
 void glFrontFace (GLenum mode)
 {
 	wes_vertbuffer_flush();
+	wes_state_update();
 	wes_gl->glFrontFace(mode);
 }
 #define glEsImpl wes_gl
-#define FlushOnStateChange() wes_vertbuffer_flush()
+#define FlushOnStateChange() wes_vertbuffer_flush();wes_state_update()
 void glPixelStorei (GLenum pname, GLint param)
 {
 	FlushOnStateChange();
@@ -931,11 +939,6 @@ void glClear (GLbitfield mask)
 	{
 	FlushOnStateChange();
 	glEsImpl->glClear(mask);
-	}
-
-void glOrtho (GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat zNear, GLfloat zFar)
-	{
-//	FlushOnStateChange();
 	}
 
 GLboolean glIsTexture(GLuint texture)
@@ -955,6 +958,8 @@ void glViewport (GLint x, GLint y, GLsizei width, GLsizei height)
 
 void glBindTexture (GLenum target, GLuint texture)
 	{
+	wes_vertbuffer_flush();
+	wes_state_update();
 	glEsImpl->glBindTexture(target, texture);
 	}
 
@@ -978,29 +983,6 @@ void glTexParameterfv(	GLenum target, GLenum pname, const GLfloat *params)
 	glTexParameterf(target, pname, params[0]);
 	}
 
-void glTexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
-	{
-	glTexImage2D(GL_TEXTURE_2D, level, internalformat,  width, 1, border, format, type, pixels);
-	}
-
-void glTexImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
-	{
-	glTexImage2D(GL_TEXTURE_2D, level, internalformat,  width, height, border, format, type, pixels);
-	}
-void glTexSubImage1D( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels )
-	{
-	glTexSubImage2D(target,level,xoffset,0,width,1,format,type,pixels);
-	}
-
-void glTexSubImage3D( GLenum target, GLint level,
-										 GLint xoffset, GLint yoffset,
-										 GLint zoffset, GLsizei width,
-										 GLsizei height, GLsizei depth,
-										 GLenum format,
-										 GLenum type, const GLvoid *pixels)
-	{
-	glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
-	}
 
 void glDeleteTextures( GLsizei n, const GLuint *textures )
 	{

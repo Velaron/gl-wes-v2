@@ -306,7 +306,7 @@ GLvoid wes_state_init()
     u_progstate.uAlphaFunc = 8;
     for(i = 0; i < WES_MULTITEX_NUM; i++){
         u_progstate.uTexture[i].Enable = 0;
-        u_progstate.uTexture[i].Mode = WES_FUNC_MODULATE;
+		u_progstate.uTexture[i].Mode = WES_FUNC_MODULATE;
         u_progstate.uTexture[i].RGBCombine = WES_FUNC_MODULATE;
         u_progstate.uTexture[i].AlphaCombine = WES_FUNC_MODULATE;
         u_progstate.uTexture[i].Arg[0].RGBSrc = WES_SRC_TEXTURE;
@@ -929,6 +929,14 @@ glTexEnvfv(GLenum target, GLenum pname, GLfloat *param)
                 break;
         }
     }
+}
+
+
+GLvoid glTexEnvf (GLenum target, GLenum pname, GLfloat param)
+{
+	wes_vertbuffer_flush();
+
+	glTexEnvi( target, pname, param );
 }
 
 GLvoid

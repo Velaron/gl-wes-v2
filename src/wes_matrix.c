@@ -868,6 +868,11 @@ glOrthof(float l, float r, float b, float t, float n, float f)
 
 }
 
+void glOrtho (GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat zNear, GLfloat zFar)
+{
+	glOrthof( left,  right, bottom, top, zNear,  zFar );
+}
+
 GLvoid
 glPushMatrix()
 {
