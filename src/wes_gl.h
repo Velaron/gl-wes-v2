@@ -35,17 +35,17 @@ extern GLvoid wes_vertbuffer_flush();
 #define glBindBuffer			    wes_gl->glBindBuffer
 #define glBindFramebuffer			wes_gl->glBindFramebuffer
 #define glBindRenderbuffer			wes_gl->glBindRenderbuffer
-#define glBindTexture			    wes_gl->glBindTexture
+//define glBindTexture			    wes_gl->glBindTexture
 #define glBlendColor			    wes_gl->glBlendColor
 #define glBlendEquation			    wes_gl->glBlendEquation
 #define glBlendEquationSeparate		wes_gl->glBlendEquationSeparate
-#define glBlendFunc			        wes_gl->glBlendFunc
+//define glBlendFunc			        wes_gl->glBlendFunc
 #define glBlendFuncSeparate			wes_gl->glBlendFuncSeparate
 #define glBufferData			    wes_gl->glBufferData
 #define glBufferSubData			    wes_gl->glBufferSubData
 #define glCheckFramebufferStatus	wes_gl->glCheckFramebufferStatus
-#define glClear			            wes_gl->glClear
-#define glClearColor			    wes_gl->glClearColor
+//define glClear			            wes_gl->glClear
+//define glClearColor			    wes_gl->glClearColor
 #define glClearDepth			    glClearDepthf
 #define glClearDepthf			    wes_gl->glClearDepthf
 #define glClearStencil			    wes_gl->glClearStencil
@@ -57,27 +57,27 @@ extern GLvoid wes_vertbuffer_flush();
 #define glCopyTexSubImage2D			wes_gl->glCopyTexSubImage2D
 #define glCreateProgram			    wes_gl->glCreateProgram
 #define glCreateShader			    wes_gl->glCreateShader
-#define glCullFace			        wes_gl->glCullFace
+//define glCullFace			        wes_gl->glCullFace
 #define glDeleteBuffers		    	wes_gl->glDeleteBuffers
 #define glDeleteFramebuffers		wes_gl->glDeleteFramebuffers
-#define glDeleteTextures			wes_gl->glDeleteTextures
+//#define glDeleteTextures			wes_gl->glDeleteTextures
 #define glDeleteProgram			    wes_gl->glDeleteProgram
 #define glDeleteRenderbuffers		wes_gl->glDeleteRenderbuffers
 #define glDeleteShader			    wes_gl->glDeleteShader
 #define glDetachShader			    wes_gl->glDetachShader
-#define glDepthFunc			        wes_gl->glDepthFunc
-#define glDepthMask			        wes_gl->glDepthMask
-#define glDepthRangef		       	wes_gl->glDepthRangef
+//define glDepthFunc			        wes_gl->glDepthFunc
+//define glDepthMask			        wes_gl->glDepthMask
+//define glDepthRangef		       	wes_gl->glDepthRangef
 //#define glDisable			        wes_gl->glDisable
 #define glDisableVertexAttribArray	wes_gl->glDisableVertexAttribArray
 #define glDrawElements			    wes_gl->glDrawElements
 //#define glEnable			        wes_gl->glEnable
 #define glEnableVertexAttribArray	wes_gl->glEnableVertexAttribArray
-#define glFinish			        wes_gl->glFinish
+//define glFinish			        wes_gl->glFinish
 #define glFlush			            wes_gl->glFlush
 #define glFramebufferRenderbuffer	wes_gl->glFramebufferRenderbuffer
 #define glFramebufferTexture2D		wes_gl->glFramebufferTexture2D
-#define glFrontFace			        wes_gl->glFrontFace
+//define glFrontFace			        wes_gl->glFrontFace
 #define glGenBuffers			    wes_gl->glGenBuffers
 #define glGenerateMipmap			wes_gl->glGenerateMipmap
 #define glGenFramebuffers			wes_gl->glGenFramebuffers
@@ -120,7 +120,7 @@ extern GLvoid wes_vertbuffer_flush();
 #define glLineWidth			        wes_gl->glLineWidth
 #define glLinkProgram			    wes_gl->glLinkProgram
 #define glPixelStorei			    wes_gl->glPixelStorei
-#define glPolygonOffset			    wes_gl->glPolygonOffset
+//define glPolygonOffset			    wes_gl->glPolygonOffset
 #define glReadPixels			    wes_gl->glReadPixels
 #define glReleaseShaderCompiler		wes_gl->glReleaseShaderCompiler
 #define glRenderbufferStorage		wes_gl->glRenderbufferStorage
@@ -137,7 +137,7 @@ extern GLvoid wes_vertbuffer_flush();
 //#define glTexImage2D			    wes_gl->glTexImage2D
 #define glTexParameterf			    wes_gl->glTexParameterf
 #define glTexParameterfv			wes_gl->glTexParameterfv
-#define glTexParameteri			    wes_gl->glTexParameteri
+//#define glTexParameteri			    wes_gl->glTexParameteri
 #define glTexParameteriv			wes_gl->glTexParameteriv
 #define glTexSubImage2D			    wes_gl->glTexSubImage2D
 #define glUniform1f			        wes_gl->glUniform1f
@@ -170,7 +170,7 @@ extern GLvoid wes_vertbuffer_flush();
 #define glVertexAttrib4f			wes_gl->glVertexAttrib4f
 #define glVertexAttrib4fv			wes_gl->glVertexAttrib4fv
 #define glVertexAttribPointer		wes_gl->glVertexAttribPointer
-#define glViewport                  wes_gl->glViewport
+//define glViewport                  wes_gl->glViewport
 
 #define glShadeModel(A)
 
@@ -208,10 +208,12 @@ extern GLvoid   glMultiTexCoord3f(GLenum tex, GLfloat s, GLfloat t, GLfloat r);
 extern GLvoid   glMultiTexCoord2f(GLenum tex, GLfloat s, GLfloat t);
 extern GLvoid   glMultiTexCoord1f(GLenum tex, GLfloat s);
 extern GLvoid   glNormal3f(GLfloat x, GLfloat y, GLfloat z);
+extern GLvoid   glNormal3fv( const GLfloat *v );
 extern GLvoid   glFogCoordf(GLfloat f);
 #define         glColor4fv(v)              glColor4f(((GLfloat*)v)[0], ((GLfloat*)v)[1], ((GLfloat*)v)[2], ((GLfloat*)v)[3])
 extern GLvoid   glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
 extern GLvoid   glColor4ub(GLubyte r, GLubyte g, GLubyte b, GLubyte a);
+extern GLvoid   glColor4ubv(const GLubyte *v );
 extern GLvoid   glColor3f(GLfloat r, GLfloat g, GLfloat b);
 extern GLvoid   glColor3ub(GLubyte r, GLubyte g, GLubyte b);
 #define         glSecondaryColor3fv(v)     glSecondaryColor3f(((GLfloat*)v)[0], ((GLfloat*)v)[1], ((GLfloat*)v)[2])
@@ -232,7 +234,7 @@ extern GLvoid   glMultiDrawElements(GLenum mode, GLsizei *count, GLenum type, GL
 extern GLvoid   glInterleavedArrays(GLenum format, GLsizei stride, const GLvoid *pointer);
 
 /*  Coordinate Transformations  */
-#define         glDepthRange(n, f)          glDepthRangef((GLfloat)n, (GLfloat)f)
+//define         glDepthRange(n, f)          glDepthRangef((GLfloat)n, (GLfloat)f)
 extern GLvoid   glMatrixMode(GLenum mode);
 extern GLvoid   glLoadMatrixf(GLfloat *m);
 extern GLvoid   glLoadMatrixTransposef(GLfloat *m);
@@ -289,5 +291,8 @@ extern GLvoid   glAlphaFunc(GLenum func, GLclampf ref);
 /*  Texture     */
 extern GLvoid   glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height,
            GLint border, GLenum format, GLenum type, const GLvoid *pixels);
+extern GLvoid   glTexParameteri (GLenum target, GLenum pname, GLint param);
+
+extern GLvoid	glDepthRange(GLclampf zNear, GLclampf zFar);
 
 #endif

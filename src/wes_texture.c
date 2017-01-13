@@ -61,6 +61,8 @@ GLvoid
 glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height,
            GLint border, GLenum format, GLenum type, const GLvoid *pixels)
 {
+	wes_vertbuffer_flush(); //?
+
     GLvoid* data = (GLvoid*) pixels;
 
     /* conversion routines */
@@ -82,6 +84,31 @@ glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, G
 
     if (data != pixels)
         free(data);
+}
+
+GLvoid glTexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+{
+    glTexImage2D(GL_TEXTURE_2D, level, internalformat,  width, 1, border, format, type, pixels);
+}
+
+GLvoid glTexImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+{
+    glTexImage2D(GL_TEXTURE_2D, level, internalformat,  width, height, border, format, type, pixels);
+}
+
+GLvoid glTexSubImage1D( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels )
+{
+    wes_gl->glTexSubImage2D(target,level,xoffset,0,width,1,format,type,pixels);
+}
+
+GLvoid glTexSubImage3D( GLenum target, GLint level,
+                                         GLint xoffset, GLint yoffset,
+                                         GLint zoffset, GLsizei width,
+                                         GLsizei height, GLsizei depth,
+                                         GLenum format,
+                                         GLenum type, const GLvoid *pixels)
+{
+    wes_gl->glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
 }
 
 GLvoid

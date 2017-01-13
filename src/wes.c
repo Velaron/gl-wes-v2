@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
 #include "wes.h"
 #include "wes_begin.h"
 #include "wes_shader.h"
@@ -31,7 +32,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     #define dlopen(A, B)    LoadLibrary(A)
     #define dlsym(A, B)     GetProcAddress((HINSTANCE__*) A, B)
     #define dlclose(A)      FreeLibrary((HINSTANCE__*) A)
-#elif defined(POSIX)
+#else
     #include <dlfcn.h>
 #endif
 
@@ -192,17 +193,23 @@ wes_init(const char *gles2)
     int i;
     void** ptr;
 
+    LOGI("Start wes_init()");
+
     wes_gl = (gles2lib_t*) malloc(sizeof(gles2lib_t));
     if (wes_gl == NULL)
     {
-        PRINT_ERROR("Could not load Allocate mem: %s", gles2);
+        LOGE("Could not load Allocate mem: %s", gles2);
     }
 
-    wes_libhandle = dlopen(gles2, RTLD_LAZY | RTLD_GLOBAL);
+	LOGI("Memory alloc wes_init()");
+
+    wes_libhandle = dlopen(gles2, RTLD_NOW | RTLD_LOCAL);//RTLD_LAZY | RTLD_GLOBAL);
     if (wes_libhandle == NULL)
     {
-        PRINT_ERROR("Could not load OpenGL ES 2 runtime library: %s", gles2);
+        LOGE("Could not load OpenGL ES 2 runtime library: %s", gles2);
     }
+
+	LOGI("lib loaded wes_init()");
 
     ptr = (void**) wes_gl;
     for(i = 0; i != WES_OGLESV2_FUNCTIONCOUNT+1; i++)
@@ -210,16 +217,28 @@ wes_init(const char *gles2)
         void* pfunc = (void*) dlsym(wes_libhandle, glfuncnames[i]);
         if (pfunc == NULL)
         {
-            PRINT_ERROR("Could not find %s in %s", glfuncnames[i], gles2
+            LOGE("Could not find %s in %s", glfuncnames[i], gles2
             );
         }
+	else
+	LOGI("Loaded %s", glfuncnames[i]);
         *ptr++ = pfunc;
     }
 
+	LOGI("methods loaded wes_init()");
+
     wes_shader_init();
+	LOGI("wes_shader_init()");
+
     wes_matrix_init();
+	LOGI("wes_matrix_init()");
+
     wes_begin_init();
+	LOGI("wes_begin_init()");
+
     wes_state_init();
+
+    LOGI("Finished wes_init()");
 }
 
 GLvoid

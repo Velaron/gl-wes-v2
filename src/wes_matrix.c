@@ -614,6 +614,12 @@ glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, GLfloat* 
 GLvoid
 glMatrixMode(GLenum mode)
 {
+
+	if (m_mode == mode)
+	{
+		return;
+	}
+
     wes_vertbuffer_flush();
     m_mode = mode;
     switch(m_mode)

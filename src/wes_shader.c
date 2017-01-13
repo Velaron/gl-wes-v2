@@ -28,6 +28,47 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define WES_PBUFFER_SIZE    128
 
+char *wesShaderTestStr =  
+"attribute highp vec4 	aPosition;\n\
+attribute lowp vec4 	aColor;\n\
+attribute mediump vec4 	aTexCoord0;\n\
+attribute mediump vec4 	aTexCoord1;\n\
+attribute mediump vec4 	aTexCoord2;\n\
+attribute mediump vec4 	aTexCoord3;\n\
+uniform highp mat4		uMVP;		//model-view-projection matrix\n\
+uniform highp mat4		uMV;		//model-view matrix\n\
+uniform highp mat3		uMVIT;		//model-view inverted & transformed matrix \n\
+uniform	bool			uEnableClipPlane[6];\n\
+uniform highp vec4 		uClipPlane[6];\n\
+\n\
+varying lowp vec4 		vColor;\n\
+varying lowp vec2		vFactor;\n\
+varying mediump vec4 	vTexCoord[4];\n\
+\n\
+highp vec4				lEye;\n\
+\n\
+void main(){\n\
+	gl_Position = uMVP * aPosition;\n\
+	lEye = uMV * aPosition;\n\
+	vColor = aColor;\n\
+	vTexCoord[0] = aTexCoord0;\n\
+	vTexCoord[1] = aTexCoord1;\n\
+	vTexCoord[2] = aTexCoord2;\n\
+	vTexCoord[3] = aTexCoord3;\n\
+	vFactor.x = 1.0;\n\
+	vFactor.y = 1.0;\n\
+\n\
+	for(int i = 0; i < 6; i++){\n\
+		if (uEnableClipPlane[i]){\n\
+			if (dot(lEye, uClipPlane[i]) < 0.0){\n\
+				vFactor.y = 0.0;\n\
+			}\n\
+		}\n\
+	}\n\
+}\n\ ";
+
+
+
 //shader global variables:
 program_t       *sh_program;
 GLboolean       sh_program_mod;
@@ -72,17 +113,24 @@ wes_shader_create(char* data, GLenum type)
     char *src[1];
     src[0] = data;
 
+    LOGI("glCreateShader");
     //Compile:
     index = wes_gl->glCreateShader(type);
+    LOGI("glCreateShader, index = %d\n", index);
     wes_gl->glShaderSource(index, 1, (const char**) src, NULL);
-    printf("1");
+    LOGI("glShaderSource\n");
+    
     wes_gl->glCompileShader(index);
-    printf("2");
+    LOGI("glCompileShader\n");
+  
     //test status:
     wes_gl->glGetShaderiv(index, GL_COMPILE_STATUS, &success);
+	LOGI("glGetShaderiv\n");
     if (success){
+	LOGI("shader success\n");
         return index;
     } else {
+	LOGI("shader error\n");
         wes_shader_error(index);
         wes_gl->glDeleteShader(index);
         return (0xFFFFFFFF);
@@ -329,27 +377,53 @@ wes_shader_init()
     sh_pbuffer_count = 0;
     sh_program_mod = GL_TRUE;
 
+#define USE_SHADER_FILE 0
+#if USE_SHADER_FILE
     //Load file into mem:
-    file = fopen("WES.vsh", "rb");
+	LOGI("Before shader load");
+    file = fopen("/sdcard/xash/WES.vsh", "rb");
 	if (!file){
-	    PRINT_ERROR("Could not find file: %s", "WES.vsh");
+	    LOGE("Could not find file: %s", "WES.vsh");
 	}
  	fseek(file, 0, SEEK_END);
 	size = ftell(file);
 	fseek(file, 0, SEEK_SET);
 	data = (char*) malloc(size + 1);
 	if (!data){
-	    PRINT_ERROR("Could not allocate: %i bytes", size + 1);
+	    LOGE("Could not allocate: %i bytes", size + 1);
     }
 	if (fread(data, sizeof(char), size, file) != size){
         free(data);
-        PRINT_ERROR("Could not read file: %s", "WES.vsh");
+        LOGE("Could not read file: %s", "WES.vsh");
 	}
 	data[size] = '\0';
 	fclose(file);
 
+	LOGI("before shader create");
     sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
+	LOGI("after shader create");
     free(data);
+#else
+#define SHADER_COMPUTE_LIGHTING
+#ifdef SHADER_COMPUTE_LIGHTING
+	//data = (char*) malloc(wesShaderLightingStr.size() + 1);
+	//strcpy(data, wesShaderLightingStr.c_str());
+	
+	LOGI("Before shader load");
+	data = (char*) malloc(strlen(wesShaderTestStr) + 1);
+	LOGI("malloc shader load");
+	strcpy(data, wesShaderTestStr);
+	LOGI("strcpy shader load");
+#else
+	data = (char*) malloc(wesShaderStr.size() + 1);
+	strcpy(data, wesShaderStr.c_str());
+#endif
+	//LOGI("Shader = %s", data);
+	sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
+	LOGI("after shader create");
+	free(data);
+	LOGI("free");
+#endif
 }
 
 

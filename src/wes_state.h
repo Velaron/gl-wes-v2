@@ -36,7 +36,7 @@ typedef struct uivec3_s     uivec3_t;
 typedef struct uivec2_s     uivec2_t;
 typedef struct ufloat_s     ufloat_t;
 typedef struct uint_s       usampler2d_t;
-typedef struct uint_s       uint_t;
+typedef struct uint_s       uintw_t;
 typedef struct uint_s       ubool_t;
 typedef struct umat2_s      umat2_t;
 typedef struct umat3_s      umat3_t;
@@ -143,7 +143,7 @@ struct uniforms_s {
     } uLight[WES_LIGHT_NUM];
 
     struct {
-        uint_t      ColorMaterial;
+        uintw_t      ColorMaterial;
         uvec4_t     ColorAmbient, ColorDiffuse, ColorSpec, ColorEmissive;
         ufloat_t 	SpecExponent;
     } uMaterial[WES_FACE_NUM];
@@ -151,7 +151,7 @@ struct uniforms_s {
     struct {
     	uvec4_t     ColorAmbient;
         ubool_t     TwoSided, LocalViewer;
-        uint_t      ColorControl;
+        uintw_t      ColorControl;
     } uLightModel;
 
     usampler2d_t    uTexUnit[WES_MULTITEX_NUM];
@@ -159,7 +159,7 @@ struct uniforms_s {
 
     ufloat_t    uRescaleFactor;
 
-    uint_t      uFogMode;
+    uintw_t      uFogMode;
     ufloat_t    uFogStart, uFogEnd, uFogDensity;
     uvec4_t     uFogColor;
 
@@ -172,7 +172,7 @@ struct uniforms_s {
     umat4_t     uMV;
     umat4_t     uMVIT;
 
-    //uint_t      uAlphaFunc;
+    //uintw_t      uAlphaFunc;
     ufloat_t    uAlphaRef;
 };
 
