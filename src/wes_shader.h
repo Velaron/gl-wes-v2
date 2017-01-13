@@ -104,7 +104,7 @@ struct uniformloc_s
     GLint  uEnableColorMaterial;
     GLint  uEnableFog;
     GLint  uEnableAlphaTest;
-    GLint  uEnableFogCoord;
+	GLint  uEnableFogCoord;
 
     struct {
         GLint  Position, ColorAmbient, ColorDiffuse, ColorSpec;

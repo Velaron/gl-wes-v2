@@ -44,7 +44,8 @@ const char* frag_header = "                         \n  "
 "varying lowp vec2 		vFactor;                    \n  "
 "varying mediump vec4 	vTexCoord[MULTITEX_NUM];    \n  "
 "                                                   \n  "
-"void main(){                                       \n  ";
+"void main(){                                       \n  "
+"gl_FragColor = vColor;								\n  ";
 
 
 GLint
@@ -527,11 +528,11 @@ wes_frag_tex(char* buff, progstate_t *s)
             switch(s->uTexture[i].Mode)
             {
                 case WES_FUNC_REPLACE:
-                    str += sprintf(str, "gl_FragColor = tex%i;\n", i);
+					str += sprintf(str, "gl_FragColor = tex%i;\n", i);
                     break;
 
                 case WES_FUNC_MODULATE:
-					str += sprintf(str, "gl_FragColor = tex%i;\n", i);
+					str += sprintf(str, "gl_FragColor *= tex%i;\n", i);
                     break;
 
                 case WES_FUNC_DECAL:

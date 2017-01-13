@@ -283,6 +283,7 @@ GLvoid
 wes_bind_program(program_t *p)
 {
     if (p->isbound) return;
+	//wes_vertbuffer_flush();
     if (sh_program) sh_program->isbound = GL_FALSE;
     sh_program_mod = GL_TRUE;
     sh_program = p;

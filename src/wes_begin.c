@@ -30,11 +30,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 GLenum          vt_mode;
 GLuint          vt_count;
+int vt_mark;
 attrib_ptr_t    vt_attrib_pointer[WES_ANUM];
 vertex_t        vt_vbuffer[WES_BUFFER_COUNT];
-GLuint          vt_vbuffer_count;
-GLshort         vt_ibuffer[WES_INDEX_COUNT];
-GLuint          vt_ibuffer_count;
+vertex_t        vt_quad_buffer[WES_BUFFER_COUNT];
+GLuint          vt_quad_count;
+GLushort         vt_ibuffer[WES_INDEX_COUNT];
+int         vt_icount = 0;
+GLushort         *vt_pibuffer = vt_ibuffer;
+int         vt_ibase;
+vertex_t        *vt_pvbuffer = vt_vbuffer;
+vertex_t        *vt_pvbuffer_mark = vt_vbuffer;
+
 vertex_t        vt_current[1];
 vertex_t        vt_const[1];
 GLuint          vt_possize, vt_color0size, vt_color1size,
@@ -42,6 +49,9 @@ GLuint          vt_possize, vt_color0size, vt_color1size,
 
 
 GLenum          vt_clienttex;
+
+GLenum          vt_sfactor = 0, vt_dfactor = 0; // glBlendFunc
+GLuint          vt_sgb = GL_FALSE;
 
 GLvoid
 wes_reset()
@@ -70,6 +80,17 @@ wes_vertbuffer_flush()
     if (!vt_count){
         return;
     }
+	wes_gl->glVertexAttrib4f(WES_APOS, vt_current->x, vt_current->y, vt_current->z, vt_current->w);
+	wes_gl->glVertexAttrib4f(WES_ATEXCOORD0, vt_current->coord[0].s, vt_current->coord[0].t, vt_current->coord[0].r, vt_current->coord[0].q);
+	wes_gl->glVertexAttrib4f(WES_ATEXCOORD1, vt_current->coord[1].s, vt_current->coord[1].t, vt_current->coord[1].r, vt_current->coord[1].q);
+	wes_gl->glVertexAttrib4f(WES_ATEXCOORD2, vt_current->coord[2].s, vt_current->coord[2].t, vt_current->coord[2].r, vt_current->coord[2].q);
+	wes_gl->glVertexAttrib4f(WES_ATEXCOORD3, vt_current->coord[3].s, vt_current->coord[3].t, vt_current->coord[3].r, vt_current->coord[3].q);
+	wes_gl->glVertexAttrib3f(WES_ANORMAL, vt_current->nx, vt_current->ny, vt_current->nz);
+	wes_gl->glVertexAttrib1f(WES_AFOGCOORD, vt_current->fog);
+	wes_gl->glVertexAttrib4f(WES_ACOLOR0, vt_current->cr0, vt_current->cg0, vt_current->cb0, vt_current->ca0);
+	wes_gl->glVertexAttrib3f(WES_ACOLOR1, vt_current->cr1, vt_current->cg1, vt_current->cb1);
+
+
 
     wes_state_update();
 
@@ -118,9 +139,9 @@ wes_vertbuffer_flush()
     } else {
         wes_gl->glDisableVertexAttribArray(WES_AFOGCOORD);
     }
-    if (vt_color0size){
+	if (vt_color0size){
         wes_gl->glEnableVertexAttribArray(WES_ACOLOR0);
-        wes_gl->glVertexAttribPointer(WES_ACOLOR0, vt_color0size, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
+		wes_gl->glVertexAttribPointer(WES_ACOLOR0, vt_color0size, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
             (GLfloat*)(vt_vbuffer) + WES_OFFSET_COLOR0);
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ACOLOR0);
@@ -133,7 +154,7 @@ wes_vertbuffer_flush()
         wes_gl->glDisableVertexAttribArray(WES_ACOLOR1);
     }
 
-    if (vt_mode == GL_QUADS){
+   /*if (vt_mode == GL_QUADS){
         int i;
         int num = vt_count / 4;
         for(i = 0; i < num; i += 1){
@@ -146,10 +167,27 @@ wes_vertbuffer_flush()
         }
         wes_gl->glDrawElements(GL_TRIANGLES, num * 6, GL_UNSIGNED_SHORT, vt_ibuffer);
     } else {
+		if (vt_mode == GL_QUAD_STRIP){
+			vt_mode = GL_TRIANGLE_STRIP;
+		}
+		if (vt_mode == GL_POLYGON){
+			vt_mode = GL_TRIANGLE_FAN;
+		}
         wes_gl->glDrawArrays(vt_mode, 0, vt_count);
-    }
+	}*/
+
+	wes_gl->glDrawElements( GL_TRIANGLES, vt_count, GL_UNSIGNED_SHORT, vt_ibuffer );
+
+
 
     wes_reset();
+	vt_count = 0;
+	vt_icount = 0;
+	vt_pvbuffer_mark = vt_pvbuffer = vt_vbuffer;
+	vt_pibuffer = vt_ibuffer;
+	vt_ibase = 0;
+	vt_possize = vt_normalsize = vt_fogcoordsize = 0;
+	vt_color1size = vt_color0size = vt_coordsize[0] = vt_coordsize[1] = 0;
 }
 
 
@@ -194,27 +232,18 @@ glBegin(GLenum mode)
 {
     vt_mode = mode;
 
-    vt_possize = vt_normalsize = vt_fogcoordsize = 0;
-    vt_color1size = vt_color0size = vt_coordsize[0] = vt_coordsize[1] = 0;
-
-    if (vt_mode == GL_QUAD_STRIP){
-        vt_mode = GL_TRIANGLE_STRIP;
-    }
-    if (vt_mode == GL_POLYGON){
-        vt_mode = GL_TRIANGLE_FAN;
-    }
+	//vt_possize = vt_normalsize = vt_fogcoordsize = 0;
+	//vt_color1size = vt_color0size = vt_coordsize[0] = vt_coordsize[1] = 0;
 
     /* Set Constant data */
-    wes_gl->glVertexAttrib4f(WES_APOS, vt_current->x, vt_current->y, vt_current->z, vt_current->w);
-    wes_gl->glVertexAttrib4f(WES_ATEXCOORD0, vt_current->coord[0].s, vt_current->coord[0].t, vt_current->coord[0].r, vt_current->coord[0].q);
-    wes_gl->glVertexAttrib4f(WES_ATEXCOORD1, vt_current->coord[1].s, vt_current->coord[1].t, vt_current->coord[1].r, vt_current->coord[1].q);
-    wes_gl->glVertexAttrib4f(WES_ATEXCOORD2, vt_current->coord[2].s, vt_current->coord[2].t, vt_current->coord[2].r, vt_current->coord[2].q);
-    wes_gl->glVertexAttrib4f(WES_ATEXCOORD3, vt_current->coord[3].s, vt_current->coord[3].t, vt_current->coord[3].r, vt_current->coord[3].q);
-    wes_gl->glVertexAttrib3f(WES_ANORMAL, vt_current->nx, vt_current->ny, vt_current->nz);
-    wes_gl->glVertexAttrib1f(WES_AFOGCOORD, vt_current->fog);
-    wes_gl->glVertexAttrib4f(WES_ACOLOR0, vt_current->cr0, vt_current->cg0, vt_current->cb0, vt_current->ca0);
-    wes_gl->glVertexAttrib3f(WES_ACOLOR1, vt_current->cr1, vt_current->cg1, vt_current->cb1);
-    *vt_const = *vt_current;
+	vt_pvbuffer_mark = vt_pvbuffer;
+	vt_ibase = vt_icount;
+	*vt_const = *vt_current;
+	//printf("%f %f %f %f\n", vt_current[0].cr0,  vt_current[0].cg0,  vt_current[0].cb0,  vt_current[0].ca0 );
+	//*vt_current = *vt_const;
+
+	vt_mark = vt_count;
+
 
 }
 
@@ -227,7 +256,7 @@ glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     vt_current->y = y;
     vt_current->z = z;
     vt_current->w = w;
-    vt_vbuffer[vt_count++] = vt_current[0];
+	*vt_pvbuffer++ = vt_current[0];
 }
 
 GLvoid
@@ -240,7 +269,7 @@ glVertex3f(GLfloat x, GLfloat y, GLfloat z)
         vt_current->x = x;
         vt_current->y = y;
         vt_current->z = z;
-        vt_vbuffer[vt_count++] = vt_current[0];
+		*vt_pvbuffer++ = vt_current[0];
     }
 }
 
@@ -252,6 +281,16 @@ glVertex3fv(GLfloat *v)
 
 GLvoid glBlendFunc(GLenum sfactor, GLenum dfactor)
 {
+	GLuint sgb = GL_FALSE;
+
+	if( sfactor == GL_SRC_ALPHA && dfactor == GL_ONE )
+		sfactor = GL_ONE, sgb = GL_TRUE;
+
+	if( sfactor == vt_sfactor && dfactor == vt_dfactor && vt_sgb == sgb )
+		return;
+
+	vt_sfactor = sfactor, vt_dfactor = dfactor, vt_sgb = sgb;
+
 	wes_vertbuffer_flush();
 	wes_state_update();
 	wes_gl->glBlendFunc(sfactor, dfactor);
@@ -260,7 +299,7 @@ GLvoid glBlendFunc(GLenum sfactor, GLenum dfactor)
 GLvoid glDepthMask( GLboolean flag )
 {
 	wes_vertbuffer_flush();
-	wes_state_update();
+	//wes_state_update();
 	wes_gl->glDepthMask( flag );
 }
 
@@ -285,7 +324,7 @@ glVertex2f(GLfloat x, GLfloat y)
         vt_possize = 2;
         vt_current->x = x;
         vt_current->y = y;
-        vt_vbuffer[vt_count++] = vt_current[0];
+		*vt_pvbuffer++ = vt_current[0];
     }
 }
 
@@ -410,9 +449,18 @@ GLvoid
 glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 {
     vt_color0size = 4;
-    vt_current->cr0 = r;
-    vt_current->cg0 = g;
-    vt_current->cb0 = b;
+	if( vt_sgb )
+	{
+		vt_current->cr0 = r * a;
+		vt_current->cg0 = g * a;
+		vt_current->cb0 = b * a;
+	}
+	else
+	{
+		vt_current->cr0 = r;
+		vt_current->cg0 = g;
+		vt_current->cb0 = b;
+	}
 	vt_current->ca0 = a;
 }
 
@@ -421,12 +469,12 @@ glColor3f(GLfloat r, GLfloat g, GLfloat b)
 {
     if (vt_color0size > 3){
         glColor4f(r, g, b, 1);
-    } else {
+	} else {
         vt_color0size = 3;
-        vt_current->cr0 = r;
-        vt_current->cg0 = g;
+		vt_current->cr0 = r;
+		vt_current->cg0 = g;
 		vt_current->cb0 = b;
-    }
+	}
 }
 
 const GLfloat ubtofloat = 1.0f / 255.0f;
@@ -435,10 +483,19 @@ GLvoid
 glColor4ub(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
 {
     vt_color0size = 4;
-    vt_current->cr0 = (GLfloat)r * ubtofloat;
-    vt_current->cg0 = (GLfloat)g * ubtofloat;
-    vt_current->cb0 = (GLfloat)b * ubtofloat;
-	vt_current->ca0 = (GLfloat)a * ubtofloat;
+	if( vt_sgb )
+	{
+		vt_current->cr0 = ( (GLfloat)r * a ) / 255.0f / 255.0f;
+		vt_current->cg0 = ( (GLfloat)g * a ) / 255.0f / 255.0f;
+		vt_current->cb0 = ( (GLfloat)b * a ) / 255.0f / 255.0f;
+	}
+	else
+	{
+		vt_current->cr0 = ( (GLfloat)r ) / 255;
+		vt_current->cg0 = ( (GLfloat)g ) / 255;
+		vt_current->cb0 = ( (GLfloat)b ) / 255;
+	}
+	vt_current->ca0 = (GLfloat)a / 255;
 }
 
 GLvoid glColor4ubv( const GLubyte *v )
@@ -450,12 +507,12 @@ GLvoid
 glColor3ub(GLubyte r, GLubyte g, GLubyte b)
 {
     if (vt_color0size > 3){
-        glColor4ub(r, g, b, 1);
+		glColor4ub(r, g, b, 255);
     } else {
         vt_color0size = 3;
-        vt_current->cr0 = (GLfloat)r * ubtofloat;
-        vt_current->cg0 = (GLfloat)g * ubtofloat;
-		vt_current->cb0 = (GLfloat)b * ubtofloat;
+		vt_current->cr0 = ( (GLfloat)r ) / 255;
+		vt_current->cg0 = ( (GLfloat)g ) / 255;
+		vt_current->cb0 = ( (GLfloat)b ) / 255;
     }
 }
 
@@ -469,10 +526,131 @@ glSecondaryColor3f(GLfloat r, GLfloat g, GLfloat b){
     vt_current->cb1 = b;
 }
 
+
+
 GLvoid
 glEnd()
 {
-	wes_vertbuffer_flush();
+	//wes_vertbuffer_flush();
+	vt_count += ((unsigned char *)vt_pvbuffer - (unsigned char *)vt_pvbuffer_mark) / sizeof( vertex_t );
+
+	if (vt_count < 3)
+		{
+		return;
+		}
+	switch (vt_mode)
+		{
+		case GL_QUADS:
+			{
+			*vt_pibuffer++ = vt_icount;
+			*vt_pibuffer++ = vt_icount+1;
+			*vt_pibuffer++ = vt_icount+2;
+			*vt_pibuffer++ = vt_icount;
+			*vt_pibuffer++ = vt_icount+2;
+			*vt_pibuffer++ = vt_icount+3;
+			vt_icount+=4;
+			vt_count += 2;
+			}
+			break;
+		case GL_TRIANGLES:
+			{
+			int  vcount = (vt_count - vt_mark)/3;
+			for (int count = 0; count < vcount; count++)
+				{
+				*vt_pibuffer++ = vt_icount;
+				*vt_pibuffer++ = vt_icount+1;
+				*vt_pibuffer++ = vt_icount+2;
+				vt_icount+=3;
+				}
+			}
+			break;
+		case GL_TRIANGLE_STRIP:
+			{
+			*vt_pibuffer++ = vt_icount;
+			*vt_pibuffer++ = vt_icount+1;
+			*vt_pibuffer++ = vt_icount+2;
+			vt_icount+=3;
+			int vcount = ((vt_count-vt_mark)-3);
+			if (vcount && ((long)vt_pibuffer & 0x02))
+				{
+				*vt_pibuffer++ = vt_icount-1; // 2
+				*vt_pibuffer++ = vt_icount-2; // 1
+				*vt_pibuffer++ = vt_icount;   // 3
+				vt_icount++;
+				vcount-=1;
+				int odd = vcount&1;
+				vcount/=2;
+				unsigned int* longptr = (unsigned int*) vt_pibuffer;
+
+				for (int count = 0; count < vcount; count++)
+					{
+					*(longptr++) = (vt_icount-2) | ((vt_icount-1)<<16);
+					*(longptr++) = (vt_icount) | ((vt_icount)<<16);
+					*(longptr++) = (vt_icount-1) | ((vt_icount+1)<<16);
+					vt_icount+=2;
+					}
+				vt_pibuffer = (unsigned short*)(longptr);
+				if (odd)
+					{
+					*vt_pibuffer++ = vt_icount-2; // 2
+					*vt_pibuffer++ = vt_icount-1; // 1
+					*vt_pibuffer++ = vt_icount;   // 3
+					vt_icount++;
+					}
+				}
+		   else
+				{
+				//already aligned
+				int odd = vcount&1;
+				vcount/=2;
+				unsigned int* longptr = (unsigned int*) vt_pibuffer;
+
+				for (int count = 0; count < vcount; count++)
+					{
+					*(longptr++) = (vt_icount-1) | ((vt_icount-2)<<16);
+					*(longptr++) = (vt_icount) | ((vt_icount-1)<<16);
+					*(longptr++) = (vt_icount) | ((vt_icount+1)<<16);
+					vt_icount+=2;
+
+					}
+				vt_pibuffer = (unsigned short*)(longptr);
+				if (odd)
+					{
+
+					*vt_pibuffer++ = vt_icount-1; // 2
+					*vt_pibuffer++ = vt_icount-2; // 1
+					*vt_pibuffer++ = vt_icount;   // 3
+					vt_icount++;
+					}
+				}
+			vt_count += (vt_count-vt_mark-3) * 2;
+			}
+			break;
+		case GL_POLYGON:
+		case GL_TRIANGLE_FAN:
+			{
+			*vt_pibuffer++ = vt_icount++;
+			*vt_pibuffer++ = vt_icount++;
+			*vt_pibuffer++ = vt_icount++;
+			int vcount = ((vt_count - vt_mark)-3);
+			for (int count = 0; count < vcount; count++)
+				{
+				*vt_pibuffer++ = vt_ibase;
+				*vt_pibuffer++ = vt_icount-1;
+				*vt_pibuffer++ = vt_icount++;
+				vt_count+=2;
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		//if( vt_pvbuffer - vt_vbuffer > 20000 * sizeof(vertex_t) ||
+			//	vt_pibuffer - vt_ibuffer > 15000 * sizeof(GLushort) )
+			wes_vertbuffer_flush();
+		*vt_current = *vt_const;
 }
 
 GLvoid
@@ -508,7 +686,7 @@ glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_ACOLOR0].type = type;
     vt_attrib_pointer[WES_ACOLOR0].stride = stride;
     vt_attrib_pointer[WES_ACOLOR0].ptr = ptr;
-    wes_gl->glVertexAttribPointer(WES_ACOLOR0, size, type, GL_FALSE, stride, ptr);
+	wes_gl->glVertexAttribPointer(WES_ACOLOR0, size, type, GL_TRUE, stride, ptr);
 }
 
 GLvoid
@@ -781,29 +959,25 @@ glClientActiveTexture(GLenum texture)
 GLvoid
 glDrawArrays(GLenum mode, GLint off, GLint num)
 {
-    wes_vertbuffer_flush();
-    wes_state_update();
+	wes_vertbuffer_flush();
     wes_gl->glDrawArrays(mode, off, num);
 }
 
 void glDepthRange(GLclampf zNear, GLclampf zFar)
 {
 	wes_vertbuffer_flush();
-	wes_state_update();
 	wes_gl->glDepthRangef( zNear, zFar );
 }
 
 void glDepthFunc (GLenum func)
 {
 	wes_vertbuffer_flush();
-	wes_state_update();
 	wes_gl->glDepthFunc( func );
 }
 
 GLvoid glFinish()
 {
 	wes_vertbuffer_flush();
-	wes_state_update();
 }
 
 GLvoid glPolygonMode()
@@ -891,8 +1065,10 @@ void glGetFloatv (GLenum pname, GLfloat *params)
 
 void glHint(GLenum target, GLenum mode)
 {
-	wes_vertbuffer_flush();
-	wes_state_update();
+	//wes_vertbuffer_flush();
+	//wes_state_update();
+	if( target == GL_FOG_HINT )
+		return;
 	wes_gl->glHint(target, mode);
 }
 
