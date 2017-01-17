@@ -64,7 +64,7 @@ GLint
 wes_frag_fog(char* buff, progstate_t *s)
 {
     char *str = buff;
-    if (s->uEnableFog)
+	if (s->uEnableFog)
     {
         str += sprintf(str,"gl_FragColor = mix(uFogColor, gl_FragColor, vFactor.x);\n");
         //gl_FragColor * vFactor.x + (1.0 - vFactor.x) * uFogColor;");

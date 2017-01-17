@@ -215,23 +215,23 @@ wes_state_update()
     int i;
 
     wes_choose_program(&u_progstate);
-/*
+
     UpdateUniform1i(uEnableRescaleNormal);
     UpdateUniform1i(uEnableNormalize);
-*/
+
     for(i = 0; i != WES_CLIPPLANE_NUM; i++){
         UpdateUniform1i(uEnableClipPlane[i]);
         UpdateUniform4f(uClipPlane[i]);
     }
 
-/*
+
     UpdateUniform1i(uEnableColorMaterial);
     UpdateUniform1i(uEnableFog);
     UpdateUniform1i(uEnableFogCoord);
     UpdateUniform1i(uEnableLighting);
-*/
 
-/*
+
+
     for(i = 0; i != WES_LIGHT_NUM; i++){
         UpdateUniform1i(uEnableLight[i]);
         UpdateUniform4f(uLight[i].Position);
@@ -247,8 +247,8 @@ wes_state_update()
         UpdateUniform1i(uTexUnit[i]);
         UpdateUniform4f(uTexEnvColor[i]);
     }
-*/
-/*
+
+
     UpdateUniform1f(uRescaleFactor);
 
     for(i = 0; i != WES_FACE_NUM; i++){
@@ -259,22 +259,22 @@ wes_state_update()
         UpdateUniform4f(uMaterial[i].ColorEmissive);
         UpdateUniform1f(uMaterial[i].SpecExponent);
     }
-*/
 
-/*
+
+
     UpdateUniform4f(uLightModel.ColorAmbient);
     UpdateUniform1i(uLightModel.TwoSided);
     UpdateUniform1i(uLightModel.LocalViewer);
     UpdateUniform1i(uLightModel.ColorControl);
-*/
 
-/*
+
+
     UpdateUniform1i(uFogMode);
     UpdateUniform1f(uFogDensity);
     UpdateUniform1f(uFogStart);
     UpdateUniform1f(uFogEnd);
     UpdateUniform4f(uFogColor);
-*/
+
     UpdateUniform1f(uAlphaRef);
 
 
@@ -298,7 +298,7 @@ GLvoid wes_state_init()
     u_activetex = 0;
     SetUniform1i(uEnableRescaleNormal, 0);
     SetUniform1i(uEnableNormalize, 0);
-    for(i = 0; i != WES_CLIPPLANE_NUM; i++){
+	for(i = 0; i < 4; i++){
         SetUniform4i(uEnableTextureGen[i], 0, 0, 0, 0);
     }
     for(i = 0; i != WES_CLIPPLANE_NUM; i++){
@@ -502,7 +502,7 @@ wes_setstate_old(GLenum e, GLboolean b)
 
     switch(e)
     {
-/*
+
         case GL_RESCALE_NORMAL:     
 			SetUniform1i(uEnableRescaleNormal, b);   
 			break;
@@ -539,7 +539,7 @@ wes_setstate_old(GLenum e, GLboolean b)
         case GL_COLOR_MATERIAL:   
 			SetUniform1i(uEnableColorMaterial, b);   
 			break;
-*/
+
 
         case GL_FOG:
             u_progstate.uEnableFog = b;
@@ -627,9 +627,9 @@ GLvoid wes_setstate (GLenum e, GLboolean b)
                 }
             break;
             }
-        case GL_FOG:
+/*        case GL_FOG:
             {
-			return;
+
             if (u_progstate.uEnableFog != b)
             {
 				wes_vertbuffer_flush();
@@ -640,6 +640,7 @@ GLvoid wes_setstate (GLenum e, GLboolean b)
             }
             break;
             }
+*/
         case GL_LIGHTING:
             {
             if (wrapglState.lighting != b)
@@ -725,7 +726,8 @@ GLvoid wes_setstate (GLenum e, GLboolean b)
             break;
             }
         default:
-			LOGI("Change state: %x not implemented",e);
+			wes_setstate_old(e,b);
+			//LOGI("Change state: %x not implemented",e);
             break;
     }
         
@@ -1049,7 +1051,7 @@ glFogfv(GLenum pname, GLfloat *param)
 GLvoid
 glTexGeni(GLenum coord, GLenum pname, GLint param)
 {
-/*
+
     wes_vertbuffer_flush();
 
     switch(pname)
@@ -1058,7 +1060,7 @@ glTexGeni(GLenum coord, GLenum pname, GLint param)
             SetUniformIndex(uTexGenMode[u_activetex], coord - GL_S, param);
             break;
     }
-*/
+
 }
 
 GLvoid
@@ -1093,13 +1095,22 @@ glTexEnvi(GLenum target, GLenum pname, GLint param)
         switch(pname)
         {
             case GL_TEXTURE_ENV_MODE:
-				if (u_progstate.uTexture[u_activetex].Mode == wes_index_envfunc(param))
+			{
+				GLint fparam = wes_index_envfunc(param);
+				// xash transparent sky workaround
+//				if( u_progstate.uTexture[u_activetex].Mode == WES_FUNC_MODULATE && fparam == WES_FUNC_REPLACE )
+//				{
+//					glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+//					return;
+//				}
+
+				if (u_progstate.uTexture[u_activetex].Mode == fparam )
 					return;
 
 				wes_vertbuffer_flush();
-                u_progstate.uTexture[u_activetex].Mode = wes_index_envfunc(param);
+				u_progstate.uTexture[u_activetex].Mode = fparam;
                 break;
-
+			}
             case GL_COMBINE_RGB:
                 u_progstate.uTexture[u_activetex].RGBCombine = wes_index_envfunc(param);
                 break;
@@ -1160,6 +1171,10 @@ glTexEnvi(GLenum target, GLenum pname, GLint param)
     }
 }
 
+GLvoid glTexEnvf (GLenum target, GLenum pname, GLfloat param)
+{
+	glTexEnvi( target, pname, param );
+}
 
 GLvoid
 glTexEnvfv(GLenum target, GLenum pname, GLfloat *param)

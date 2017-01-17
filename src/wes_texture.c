@@ -24,6 +24,57 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes.h"
 #include "wes_gl_defines.h"
 
+GLboolean need_mipmap = GL_FALSE;
+
+GLvoid
+glTexParameteri (GLenum target, GLenum pname, GLint param)
+{
+	if( pname == 0x8191) // GL_GENERATE_MIPMAP
+	{
+		need_mipmap = GL_TRUE;
+		return;
+	}
+	if (pname == GL_TEXTURE_BORDER_COLOR)
+	{
+		return; // not supported by opengl es
+	}
+	if (    (pname == GL_TEXTURE_WRAP_S ||
+			 pname == GL_TEXTURE_WRAP_T) &&
+			 param == GL_CLAMP)   {
+		param = 0x812F;
+	}
+
+	wes_vertbuffer_flush();
+
+	wes_gl->glTexParameteri(target, pname, param);
+}
+
+GLvoid
+glTexParameterf (GLenum target, GLenum pname, GLfloat param)
+{
+	if (pname == GL_TEXTURE_BORDER_COLOR)
+		{
+		return; // not supported by opengl es
+		}
+	if (    (pname == GL_TEXTURE_WRAP_S ||
+			 pname == GL_TEXTURE_WRAP_T) &&
+			 param == GL_CLAMP)
+			 {
+			 param = 0x812F;
+			 }
+
+	wes_vertbuffer_flush();
+
+	wes_gl->glTexParameterf(target, pname, param);
+}
+
+GLvoid
+glTexParameterfv(	GLenum target, GLenum pname, const GLfloat *params)
+{
+	glTexParameterf(target, pname, params[0]);
+}
+
+
 GLvoid
 wes_convert_BGR2RGB(const GLubyte* inb, GLubyte* outb, GLint size)
 {
@@ -84,12 +135,23 @@ glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, G
 
     if (data != pixels)
         free(data);
+
+	if( need_mipmap )
+	{
+		wes_gl->glGenerateMipmap(target);
+		need_mipmap = GL_FALSE;
+	}
 }
 
 
 GLvoid glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
 {
 	wes_gl->glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
+	if( need_mipmap )
+	{
+		wes_gl->glGenerateMipmap(target);
+		need_mipmap = GL_FALSE;
+	}
 }
 
 

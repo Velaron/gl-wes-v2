@@ -44,10 +44,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG,__VA_ARGS__)
 #else
 
-#define LOGI(...) printf("I: "__VA_ARGS__)
-#define LOGD(...) if(DEBUG_NANO) printf("D: "__VA_ARGS__) 
-#define LOGE(...) printf("E: "__VA_ARGS__)
-#define LOGW(...) printf("W: "__VA_ARGS__)
+#define LOGI(...) printf("I: \n"__VA_ARGS__)
+#define LOGD(...) if(DEBUG_NANO) printf("D: \n"__VA_ARGS__)
+#define LOGE(...) printf("E: \n"__VA_ARGS__)
+#define LOGW(...) printf("W: \n"__VA_ARGS__)
 
 #endif
 

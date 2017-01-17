@@ -159,7 +159,7 @@ struct uniforms_s {
 
     ufloat_t    uRescaleFactor;
 
-    uintw_t      uFogMode;
+	uintw_t      uFogMode;
     ufloat_t    uFogStart, uFogEnd, uFogDensity;
     uvec4_t     uFogColor;
 

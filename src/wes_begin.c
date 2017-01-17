@@ -158,7 +158,7 @@ wes_vertbuffer_flush()
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ANORMAL);
     }
-/*
+
     if (vt_fogcoordsize){
         wes_gl->glEnableVertexAttribArray(WES_AFOGCOORD);
         wes_gl->glVertexAttribPointer(WES_AFOGCOORD, vt_fogcoordsize, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
@@ -166,7 +166,7 @@ wes_vertbuffer_flush()
     } else {
         wes_gl->glDisableVertexAttribArray(WES_AFOGCOORD);
     }
-*/
+
     if (vt_color0size){
         wes_gl->glEnableVertexAttribArray(WES_ACOLOR0);
 		wes_gl->glVertexAttribPointer(WES_ACOLOR0, vt_color0size, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
@@ -261,10 +261,10 @@ glBegin(GLenum mode)
 */
 
 
-/*?
+
     wes_gl->glVertexAttrib3f(WES_ANORMAL, vt_current->nx, vt_current->ny, vt_current->nz);
     wes_gl->glVertexAttrib1f(WES_AFOGCOORD, vt_current->fog);
-*/
+
 	//wes_gl->glVertexAttrib4f(WES_ACOLOR0, vt_current->cr0, vt_current->cg0, vt_current->cb0, vt_current->ca0);
 
 
@@ -329,10 +329,7 @@ GLvoid glDepthMask( GLboolean flag )
 	wes_gl->glDepthMask( flag );
 }
 */
-GLvoid glTexEnvf (GLenum target, GLenum pname, GLfloat param)
-{
-	return;
-}
+
 
 GLvoid glShadeModel (GLenum mode)
 {
@@ -1115,48 +1112,6 @@ GLvoid glDrawElements( GLenum mode, GLsizei count, GLenum type, const GLvoid *in
 	glClientActiveTexture( GL_TEXTURE0 );
 	wes_state_update();
 	wes_gl->glDrawElements(mode, count, type, indices);
-}
-GLvoid
-glTexParameteri (GLenum target, GLenum pname, GLint param)
-{
-    if (pname == GL_TEXTURE_BORDER_COLOR) 
-    {
-		return; // not supported by opengl es
-    }
-    if (    (pname == GL_TEXTURE_WRAP_S ||
-             pname == GL_TEXTURE_WRAP_T) &&
-             param == GL_CLAMP)   {
-		param = 0x812F;
-	}
-
-    wes_vertbuffer_flush();
-
-    wes_gl->glTexParameteri(target, pname, param);
-}
-
-GLvoid
-glTexParameterf (GLenum target, GLenum pname, GLfloat param)
-{
-    if (pname == GL_TEXTURE_BORDER_COLOR)
-        {
-        return; // not supported by opengl es
-        }
-    if (    (pname == GL_TEXTURE_WRAP_S ||
-             pname == GL_TEXTURE_WRAP_T) &&
-             param == GL_CLAMP)
-             {
-             param = 0x812F;
-             }
-
-    wes_vertbuffer_flush();
-
-	wes_gl->glTexParameterf(target, pname, param);
-}
-    
-GLvoid
-glTexParameterfv(	GLenum target, GLenum pname, const GLfloat *params) 
-{
-    glTexParameterf(target, pname, params[0]);
 }
 
 GLvoid glFrontFace (GLenum mode)

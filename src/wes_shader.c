@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes_fragment.h"
 
 #define WES_PBUFFER_SIZE    128
-
+/*
 char *wesShaderTestStr =  
 "attribute highp vec4 	aPosition;\n\
 attribute lowp vec4 	aColor;\n\
@@ -66,7 +66,7 @@ void main(){\n\
 		}\n\
 	}\n\
 }\n\ ";
-
+*/
 
 
 //shader global variables:
@@ -296,9 +296,9 @@ wes_progstate_cmp(progstate_t* s0, progstate_t* s1)
 
     for(i = 0; i != WES_MULTITEX_NUM; i++)
     {
-        if (s0->uTexture[i].Enable != s1->uTexture[i].Enable)
-            return 1;
-        else if (s0->uTexture[i].Enable){
+		if (s0->uTexture[i].Enable != s1->uTexture[i].Enable)
+			return 1;
+		else if (s0->uTexture[i].Enable){
 
             if (s0->uTexture[i].Mode != s1->uTexture[i].Mode)
                 return 1;
