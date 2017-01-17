@@ -377,7 +377,7 @@ wes_shader_init()
     sh_pbuffer_count = 0;
     sh_program_mod = GL_TRUE;
 
-#define USE_SHADER_FILE 0
+#define USE_SHADER_FILE 1
 #if USE_SHADER_FILE
     //Load file into mem:
     file = fopen("/mnt/data/xash/WES.vsh", "rb");

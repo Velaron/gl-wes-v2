@@ -62,6 +62,7 @@ typedef struct
 	GLenum cullface;
 	GLenum sfactor;                    
     GLenum dfactor; 
+	GLboolean sgb;
 } wrapState2;      
 
 static wrapState2 wrapglState2;
@@ -168,7 +169,7 @@ wes_vertbuffer_flush()
 */
     if (vt_color0size){
         wes_gl->glEnableVertexAttribArray(WES_ACOLOR0);
-        wes_gl->glVertexAttribPointer(WES_ACOLOR0, vt_color0size, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
+		wes_gl->glVertexAttribPointer(WES_ACOLOR0, vt_color0size, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
             (GLfloat*)(vt_vbuffer) + WES_OFFSET_COLOR0);
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ACOLOR0);
@@ -236,15 +237,15 @@ glBegin(GLenum mode)
     vt_mark = vt_count;
     vt_indexbase = vt_indexcount;
 
-    vt_possize = vt_normalsize = vt_fogcoordsize = 0;
+	/*vt_possize = vt_normalsize = vt_fogcoordsize = 0;
     vt_color1size = vt_color0size = vt_coordsize[0] = vt_coordsize[1] = 0;
-
-    if (vt_mode == GL_QUAD_STRIP){
+*/
+	/*if (vt_mode == GL_QUAD_STRIP){
         vt_mode = GL_TRIANGLE_STRIP;
     }
     if (vt_mode == GL_POLYGON){
         vt_mode = GL_TRIANGLE_FAN;
-    }
+	}*/
 
     /* Set Constant data */
 
@@ -264,7 +265,7 @@ glBegin(GLenum mode)
     wes_gl->glVertexAttrib3f(WES_ANORMAL, vt_current->nx, vt_current->ny, vt_current->nz);
     wes_gl->glVertexAttrib1f(WES_AFOGCOORD, vt_current->fog);
 */
-    wes_gl->glVertexAttrib4f(WES_ACOLOR0, vt_current->cr0, vt_current->cg0, vt_current->cb0, vt_current->ca0);
+	//wes_gl->glVertexAttrib4f(WES_ACOLOR0, vt_current->cr0, vt_current->cg0, vt_current->cb0, vt_current->ca0);
 
 
     //wes_gl->glVertexAttrib3f(WES_ACOLOR1, vt_current->cr1, vt_current->cg1, vt_current->cb1);
@@ -494,6 +495,8 @@ GLvoid
 glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 {
     vt_color0size = 4;
+	if( wrapglState2.sgb )
+		r*=a,g*=a,b*=a;
     vt_ccurrent->cr0 = r;
     vt_ccurrent->cg0 = g;
     vt_ccurrent->cb0 = b;
@@ -542,6 +545,12 @@ glColor4ub(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
     vt_ccurrent->cg0 = g / 255.0f;// * ubtofloat;
     vt_ccurrent->cb0 = b / 255.0f;// * ubtofloat;
     vt_ccurrent->ca0 = a / 255.0f;// * ubtofloat;
+	if( wrapglState2.sgb )
+	{
+		vt_ccurrent->cr0 *= vt_ccurrent->ca0;
+		vt_ccurrent->cg0 *= vt_ccurrent->ca0;
+		vt_ccurrent->cb0 *= vt_ccurrent->ca0;
+	}
 
     vt_current->cr0 = vt_ccurrent->cr0;
     vt_current->cg0 = vt_ccurrent->cg0;
@@ -756,6 +765,8 @@ rev=0;
         }
 
    //wes_vertbuffer_flush();
+//	if( vt_count > 20000 || vt_vertcount > 40000 )
+	//	wes_vertbuffer_flush();
 }
 
 GLvoid
@@ -785,13 +796,13 @@ glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
 GLvoid
 glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
 {
-    //wes_vertbuffer_flush(); ?
+	wes_vertbuffer_flush();
     vt_attrib_pointer[WES_ACOLOR0].isenabled = GL_TRUE;
     vt_attrib_pointer[WES_ACOLOR0].size = size;
     vt_attrib_pointer[WES_ACOLOR0].type = type;
     vt_attrib_pointer[WES_ACOLOR0].stride = stride;
     vt_attrib_pointer[WES_ACOLOR0].ptr = ptr;
-    wes_gl->glVertexAttribPointer(WES_ACOLOR0, size, type, GL_FALSE, stride, ptr);
+	wes_gl->glVertexAttribPointer(WES_ACOLOR0, size, type, GL_TRUE, stride, ptr);
 }
 
 GLvoid
@@ -834,7 +845,7 @@ glFogCoordPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
 GLvoid
 glEnableClientState(GLenum array)
 {
-    //wes_vertbuffer_flush(); ?
+	wes_vertbuffer_flush();// ?
     switch(array)
     {
         case GL_VERTEX_ARRAY:
@@ -870,7 +881,7 @@ glEnableClientState(GLenum array)
 GLvoid
 glDisableClientState(GLenum array)
 {
-    //wes_vertbuffer_flush(); ?
+	wes_vertbuffer_flush(); //?
 
     switch(array)
     {
@@ -1101,6 +1112,8 @@ GLvoid glPolygonOffset( GLfloat factor, GLfloat units )
 GLvoid glDrawElements( GLenum mode, GLsizei count, GLenum type, const GLvoid *indices )
 {
 	wes_vertbuffer_flush();
+	glClientActiveTexture( GL_TEXTURE0 );
+	wes_state_update();
 	wes_gl->glDrawElements(mode, count, type, indices);
 }
 GLvoid
@@ -1231,6 +1244,9 @@ void glGetFloatv (GLenum pname, GLfloat *params)
 
 void glHint(GLenum target, GLenum mode)
 {
+	if( target == GL_FOG_HINT )
+		return;
+
 	wes_vertbuffer_flush();
 	wes_gl->glHint(target, mode);
 }
@@ -1416,14 +1432,20 @@ GLvoid glCullFace (GLenum mode)
 
 GLvoid glBlendFunc (GLenum sfactor, GLenum dfactor)
 {
-    if ((wrapglState2.sfactor == sfactor) && (wrapglState2.dfactor == dfactor))
-    {
-        return;
-    }
+	GLuint sgb = GL_FALSE;
+
+	if( sfactor == GL_SRC_ALPHA && dfactor == GL_ONE )
+		sfactor = GL_ONE, sgb = GL_TRUE;
+
+	if( sfactor == wrapglState2.sfactor && dfactor == wrapglState2.dfactor && wrapglState2.sgb == sgb )
+		return;
+
+	wes_vertbuffer_flush();
 
     wrapglState2.sfactor = sfactor;
     wrapglState2.dfactor = dfactor;
-    wes_vertbuffer_flush();
+	wrapglState2.sgb = sgb;
+
     wes_gl->glBlendFunc(sfactor, dfactor);
 }
 
