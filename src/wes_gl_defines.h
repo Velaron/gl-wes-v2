@@ -551,8 +551,10 @@ typedef int             GLsizeiptr;
 
 /* TextureWrapMode */
 #define GL_REPEAT                         0x2901
+#define GL_CLAMP			  0x2900
 #define GL_CLAMP_TO_EDGE                  0x812F
 #define GL_MIRRORED_REPEAT                0x8370
+#define GL_TEXTURE_BORDER_COLOR		  0x1004
 
 /* Uniform Types */
 #define GL_FLOAT_VEC2                     0x8B50

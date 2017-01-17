@@ -25,8 +25,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define __WES_BEGIN_H__
 
 /* Buffer sizes*/
-#define WES_BUFFER_COUNT        (16000)
-#define WES_INDEX_COUNT         (16000)
+#define WES_BUFFER_COUNT        (40000) //16000
+#define WES_INDEX_COUNT         (30000) //16000
 
 //offsets within Vertex struct
 #define WES_OFFSET_VERT        0

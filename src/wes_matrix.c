@@ -614,6 +614,12 @@ glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, GLfloat* 
 GLvoid
 glMatrixMode(GLenum mode)
 {
+
+	if (m_mode == mode)
+	{
+		return;
+	}
+
     wes_vertbuffer_flush();
     m_mode = mode;
     switch(m_mode)
@@ -868,6 +874,10 @@ glOrthof(float l, float r, float b, float t, float n, float f)
 
 }
 
+GLvoid glOrtho (GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat zNear, GLfloat zFar)
+{
+	glOrthof(left,right,bottom,top, zNear,zFar);
+}
 GLvoid
 glPushMatrix()
 {
