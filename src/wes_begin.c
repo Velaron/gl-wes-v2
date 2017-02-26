@@ -133,7 +133,7 @@ wes_vertbuffer_flush()
     if (vt_coordsize[0]){
         wes_gl->glEnableVertexAttribArray(WES_ATEXCOORD0);
         wes_gl->glVertexAttribPointer(WES_ATEXCOORD0, vt_coordsize[0], GL_FLOAT, GL_FALSE, sizeof(vertex_t),
-            (void*)WES_OFFSET_TEXCOORD0);
+            (void*)WES_OFFSET_TEXCOORD0*sizeof(float));
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ATEXCOORD0);
     }
@@ -163,7 +163,7 @@ wes_vertbuffer_flush()
     if (vt_normalsize){
         wes_gl->glEnableVertexAttribArray(WES_ANORMAL);
         wes_gl->glVertexAttribPointer(WES_ANORMAL, vt_normalsize, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
-            (void*) WES_OFFSET_NORMAL);
+            (void*) WES_OFFSET_NORMAL*sizeof(float));
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ANORMAL);
     }
@@ -171,7 +171,7 @@ wes_vertbuffer_flush()
     if (vt_fogcoordsize){
         wes_gl->glEnableVertexAttribArray(WES_AFOGCOORD);
         wes_gl->glVertexAttribPointer(WES_AFOGCOORD, vt_fogcoordsize, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
-            (void*) WES_OFFSET_FOGCOORD);
+            (void*) WES_OFFSET_FOGCOORD*sizeof(float));
     } else {
         wes_gl->glDisableVertexAttribArray(WES_AFOGCOORD);
     }
@@ -179,7 +179,7 @@ wes_vertbuffer_flush()
     if (vt_color0size){
         wes_gl->glEnableVertexAttribArray(WES_ACOLOR0);
 		wes_gl->glVertexAttribPointer(WES_ACOLOR0, vt_color0size, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
-            (void*) WES_OFFSET_COLOR0);
+            (void*) WES_OFFSET_COLOR0*sizeof(float));
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ACOLOR0);
     }
