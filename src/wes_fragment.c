@@ -444,6 +444,8 @@ wes_frag_combine(char *buff, progstate_t *s, int tex)
         }
 
     }
+	if(s->uTexture[tex].RGBScale)
+		str += sprintf(str, "gl_FragColor.rgb *= %f;\n", s->uTexture[tex].RGBScale );
 
     return (GLint)(str - buff);
 }

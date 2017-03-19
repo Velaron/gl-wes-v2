@@ -1166,6 +1166,8 @@ glTexEnvi(GLenum target, GLenum pname, GLint param)
             case GL_OPERAND2_ALPHA:
                 u_progstate.uTexture[u_activetex].Arg[2].AlphaOp = wes_index_envop(param);
                 break;
+			case GL_RGB_SCALE:
+				u_progstate.uTexture[u_activetex].RGBScale = param;
 
         }
     }

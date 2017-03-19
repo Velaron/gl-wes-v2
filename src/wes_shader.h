@@ -154,11 +154,12 @@ struct progstate_s
     int uAlphaFunc;
 
     int uEnableFog;
-    int uEnableClipPlane;
+	int uEnableClipPlane;
     struct {
         GLboolean Enable;
         GLint Mode;
-        GLint RGBCombine, AlphaCombine;
+		GLint RGBCombine, AlphaCombine;
+		GLfloat RGBScale;
         struct {
             GLint RGBSrc, AlphaSrc;
             GLint RGBOp, AlphaOp;
