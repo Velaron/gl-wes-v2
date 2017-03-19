@@ -27,8 +27,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes_fragment.h"
 
 #define WES_PBUFFER_SIZE    128
-/*
-char *wesShaderTestStr =  
+
+char *wesShaderTestStr =
 "attribute highp vec4 	aPosition;\n\
 attribute lowp vec4 	aColor;\n\
 attribute mediump vec4 	aTexCoord0;\n\
@@ -66,7 +66,7 @@ void main(){\n\
 		}\n\
 	}\n\
 }\n\ ";
-*/
+
 
 
 //shader global variables:
@@ -377,12 +377,11 @@ wes_shader_init()
     sh_pbuffer_count = 0;
     sh_program_mod = GL_TRUE;
 
-#define USE_SHADER_FILE 1
-#if USE_SHADER_FILE
+
+#ifdef SHADER_FILE
     //Load file into mem:
-    file = fopen("/mnt/data/xash/WES.vsh", "rb");
+	file = fopen(SHADER_FILE, "rb");
 	LOGI("Before shader load");
-    //file = fopen("/sdcard/xash/WES.vsh", "rb");
 	if (!file){
 	    LOGE("Could not find file: %s", "WES.vsh");
 	}
