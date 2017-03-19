@@ -187,7 +187,9 @@ const char* glfuncnames[] =
     "glViewport"
 };
 
-
+#ifdef XASH_SDL
+void *SDL_GL_GetProcAddress( const char*);
+#endif
 GLvoid
 wes_init(const char *gles2)
 {
@@ -203,19 +205,24 @@ wes_init(const char *gles2)
     }
 
 	LOGI("Memory alloc wes_init()");
+#ifndef XASH_SDL
+	wes_libhandle = dlopen(gles2, RTLD_NOW | RTLD_LOCAL);//RTLD_LAZY | RTLD_GLOBAL);
 
-    wes_libhandle = dlopen(gles2, RTLD_NOW | RTLD_LOCAL);//RTLD_LAZY | RTLD_GLOBAL);
-    if (wes_libhandle == NULL)
+	if (wes_libhandle == NULL)
     {
         LOGE("Could not load OpenGL ES 2 runtime library: %s", gles2);
     }
-
+#endif
 	LOGI("lib loaded wes_init()");
 
     ptr = (void**) wes_gl;
     for(i = 0; i != WES_OGLESV2_FUNCTIONCOUNT+1; i++)
     {
-        void* pfunc = (void*) dlsym(wes_libhandle, glfuncnames[i]);
+#ifdef XASH_SDL
+		void* pfunc = (void*) SDL_GL_GetProcAddress(glfuncnames[i]);
+#else
+		void* pfunc = (void*) dlsym(wes_libhandle, glfuncnames[i]);
+#endif
         if (pfunc == NULL)
         {
             LOGE("Could not find %s in %s", glfuncnames[i], gles2
