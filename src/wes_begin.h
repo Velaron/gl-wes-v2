@@ -59,7 +59,25 @@ struct attrib_ptr_s {
     GLenum      type;
     GLsizei     stride;
     const GLvoid *ptr;
+#ifdef WES_VBO
+	GLuint vboid;
+#endif
 };
+
+typedef struct
+{
+	GLboolean depthmask;
+	GLclampf depth_range_near;
+	GLclampf depth_range_far;
+	GLenum depth_func;
+	GLuint boundtexture;
+	GLenum cullface;
+	GLenum sfactor;
+	GLenum dfactor;
+	GLboolean sgb;
+} wrapState2;
+
+extern wrapState2 wrapglState2;
 
 //function declarations:
 extern GLvoid wes_begin_init();
