@@ -28,7 +28,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define max(A, B)   ((A > B) ? A : B)
 
-const char* frag_header = "                         \n  "
+const char* frag_header = ""
+//						  "#define highp\n#define lowp\n#define mediump                         \n  "
 "#define LIGHT_NUM						8           \n  "
 "#define CLIPPLANE_NUM					6           \n  "
 "#define MULTITEX_NUM					4           \n  "

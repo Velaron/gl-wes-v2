@@ -715,10 +715,11 @@ GLvoid wes_setstate (GLenum e, GLboolean b)
             {
                 wes_vertbuffer_flush();
 
-                if (b)  
+			   /* if (b)
 					wes_gl->glEnable(e);
         		else    
 					wes_gl->glDisable(e);
+				*/
 
                 u_progstate.uTexture[u_activetex].Enable = b;
                 return;

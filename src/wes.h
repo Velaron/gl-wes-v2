@@ -229,4 +229,5 @@ extern gles2lib_t* wes_gl;
 
 extern GLvoid wes_init(const char *gles2);
 extern GLvoid wes_destroy();
+extern GLvoid wes_vertbuffer_flush(void);
 #endif

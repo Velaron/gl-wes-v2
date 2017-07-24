@@ -51,6 +51,9 @@ GLuint 		vt_mark = 0;
 int 		vt_indexbase = 0;
 
 GLenum          vt_clienttex;
+int vboarray;
+int skipnanogl;
+int vbo_bkp_id;
 
 
 
@@ -84,6 +87,8 @@ wes_reset()
     vt_mark = 0;
     vt_indexcount = 0;
     *vt_current = *vt_const;
+	if( skipnanogl )
+		return;
 
     for(i = 0; i < WES_ANUM; i++)
     {
@@ -106,6 +111,8 @@ wes_vertbuffer_flush()
     }
 
     wes_state_update();
+	if( skipnanogl )
+		return;
 
 	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
 	wes_gl->glBufferData(GL_ARRAY_BUFFER, vt_count*sizeof(vertex_t), vt_vbuffer, GL_STREAM_DRAW);
@@ -126,7 +133,7 @@ wes_vertbuffer_flush()
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ATEXCOORD0);
     }
-/*
+
     if (vt_coordsize[1]){
         wes_gl->glEnableVertexAttribArray(WES_ATEXCOORD1);
         wes_gl->glVertexAttribPointer(WES_ATEXCOORD1, vt_coordsize[1], GL_FLOAT, GL_FALSE, sizeof(vertex_t),
@@ -148,7 +155,7 @@ wes_vertbuffer_flush()
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ATEXCOORD3);
     }
-*/
+
     if (vt_normalsize){
         wes_gl->glEnableVertexAttribArray(WES_ANORMAL);
         wes_gl->glVertexAttribPointer(WES_ANORMAL, vt_normalsize, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
@@ -510,6 +517,9 @@ glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     vt_current->cg0 = vt_ccurrent->cg0;
     vt_current->cb0 = vt_ccurrent->cb0;
     vt_current->ca0 = vt_ccurrent->ca0;
+	if( !vt_attrib_pointer[WES_ACOLOR0].isenabled )
+		wes_gl->glVertexAttrib4f(WES_ACOLOR0, r, g, b, a);
+
 }
 
 GLvoid
@@ -785,6 +795,7 @@ glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
 #ifndef WES_VBO
 	wes_gl->glVertexAttribPointer(WES_APOS, size, type, GL_FALSE, stride, ptr);
 #endif
+	arraysValid = GL_FALSE;
 }
 
 GLvoid
@@ -858,11 +869,14 @@ GLvoid
 glEnableClientState(GLenum array)
 {
 	wes_vertbuffer_flush();// ?
+	arraysValid = 0;
     switch(array)
     {
         case GL_VERTEX_ARRAY:
             wes_gl->glEnableVertexAttribArray(WES_APOS);
             vt_attrib_pointer[WES_APOS].isenabled = GL_TRUE;
+			if( skipnanogl )
+				vboarray = 1;
             break;
         case GL_NORMAL_ARRAY:
             wes_gl->glEnableVertexAttribArray(WES_ANORMAL);
@@ -894,12 +908,15 @@ GLvoid
 glDisableClientState(GLenum array)
 {
 	wes_vertbuffer_flush(); //?
+	arraysValid = 0;
 
     switch(array)
     {
         case GL_VERTEX_ARRAY:
             wes_gl->glDisableVertexAttribArray(WES_APOS);
             vt_attrib_pointer[WES_APOS].isenabled = GL_FALSE;
+			if( skipnanogl )
+				vboarray = 0;
             break;
         case GL_NORMAL_ARRAY:
             wes_gl->glDisableVertexAttribArray(WES_ANORMAL);
@@ -1085,6 +1102,21 @@ glClientActiveTexture(GLenum texture)
 }
 
 GLvoid
+glClientActiveTextureARB(GLenum texture)
+{
+   // wes_vertbuffer_flush();
+	vt_clienttex = texture - GL_TEXTURE0;
+}
+
+GLvoid
+glActiveTextureARB(GLenum texture)
+{
+	wes_vertbuffer_flush();
+	vt_clienttex = texture - GL_TEXTURE0;
+	wes_gl->glActiveTexture( texture );
+}
+
+GLvoid
 glDrawArrays(GLenum mode, GLint off, GLint num)
 {
     wes_vertbuffer_flush();
@@ -1123,6 +1155,15 @@ GLvoid glPolygonOffset( GLfloat factor, GLfloat units )
 #ifdef WES_VBO
 static void wes_vertex_attrib_pointer(int i, int count, GLboolean norm)
 {
+	if(!vt_attrib_pointer[i].isenabled)
+		return;
+	if( skipnanogl )
+	{
+		//wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].vboid );
+		//wes_gl->glBufferData(GL_ARRAY_BUFFER, count , (void*)vt_attrib_pointer[i].ptr, GL_STREAM_DRAW);
+		wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride,vt_attrib_pointer[i].ptr);
+		return;
+	}
 	if( !vt_attrib_pointer[i].vboid )
 		wes_gl->glGenBuffers(1, &vt_attrib_pointer[i].vboid );
 	wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].vboid );
@@ -1144,6 +1185,10 @@ GLvoid glDrawRangeElements( GLenum mode, GLuint start, GLuint end, GLsizei count
 
 	wes_state_update();
 	wes_vertex_attrib_pointer( WES_ATEXCOORD0, end * 8, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD1, end * 8, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD2, end * 8, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD3, end * 8, GL_FALSE );
+
 	wes_vertex_attrib_pointer( WES_ACOLOR0, end*4, GL_TRUE );
 	wes_vertex_attrib_pointer( WES_APOS, end*12, GL_FALSE );
 
@@ -1151,6 +1196,11 @@ GLvoid glDrawRangeElements( GLenum mode, GLuint start, GLuint end, GLsizei count
 	wes_gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * 2, indices, GL_STREAM_DRAW);
 
 	wes_gl->glDrawElements(mode, count, type, 0);
+}
+
+GLvoid glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices )
+{
+	glDrawRangeElements(mode, 0, 65536, count, type, indices );
 }
 #else
 GLvoid glDrawElements( GLenum mode, GLsizei count, GLenum type, const GLvoid *indices )
@@ -1476,3 +1526,42 @@ glPolygonMode( GLenum face, GLenum mode )
 
 }
 */
+
+
+void glBindBufferARB( GLuint target, GLuint index )
+{
+	if( index && !vbo_bkp_id && !skipnanogl )
+		FlushOnStateChange();
+	glDisableClientState( GL_COLOR_ARRAY );
+	glColor4f( 1,1,1,1 );
+
+	if( index && !vbo_bkp_id && !skipnanogl )
+		wes_vertbuffer_flush();
+	skipnanogl = (!!index) || vboarray;
+	glEsImpl->glBindBuffer( target, index );
+	if( vbo_bkp_id && !index )
+	{
+		arraysValid = GL_FALSE;
+	}
+	vbo_bkp_id = index;
+}
+
+void glGenBuffersARB( GLuint count, GLuint *indexes )
+{
+	glEsImpl->glGenBuffers( count, indexes );
+}
+
+void glDeleteBuffersARB( GLuint count, GLuint *indexes )
+{
+	glEsImpl->glDeleteBuffers( count, indexes );
+}
+
+void glBufferDataARB( GLuint target, GLuint size, void *buffer, GLuint type )
+{
+	glEsImpl->glBufferData( target, size, buffer, type );
+}
+
+void glBufferSubDataARB( GLuint target, GLsizei offset, GLsizei size, void *buffer )
+{
+	glEsImpl->glBufferSubData( target, offset, size, buffer );
+}

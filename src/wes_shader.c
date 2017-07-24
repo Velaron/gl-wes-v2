@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define WES_PBUFFER_SIZE    128
 
-char *wesShaderTestStr =
+char *wesShaderTestStr =//"#define highp\n#define lowp\n#define mediump\n"
 "attribute highp vec4 	aPosition;\n\
 attribute lowp vec4 	aColor;\n\
 attribute mediump vec4 	aTexCoord0;\n\
