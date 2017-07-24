@@ -1114,6 +1114,7 @@ glActiveTextureARB(GLenum texture)
 	wes_vertbuffer_flush();
 	vt_clienttex = texture - GL_TEXTURE0;
 	wes_gl->glActiveTexture( texture );
+	u_activetex = vt_clienttex;
 }
 
 GLvoid
