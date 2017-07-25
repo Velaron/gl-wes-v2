@@ -792,9 +792,11 @@ glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_APOS].type = type;
     vt_attrib_pointer[WES_APOS].stride = stride;
     vt_attrib_pointer[WES_APOS].ptr = ptr;
-#ifndef WES_VBO
-	wes_gl->glVertexAttribPointer(WES_APOS, size, type, GL_FALSE, stride, ptr);
+	vt_attrib_pointer[WES_APOS].vbo_id = vbo_bkp_id;
+#ifndef WES_WEBGL
+	if( vbo_bkp_id )
 #endif
+	wes_gl->glVertexAttribPointer(WES_APOS, size, type, GL_FALSE, stride, ptr);
 	arraysValid = GL_FALSE;
 }
 
@@ -807,9 +809,11 @@ glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_ANORMAL].type = type;
     vt_attrib_pointer[WES_ANORMAL].stride = stride;
     vt_attrib_pointer[WES_ANORMAL].ptr = ptr;
-#ifndef WES_VBO
-	wes_gl->glVertexAttribPointer(WES_ANORMAL, 3, type, GL_FALSE, stride, ptr);
+	vt_attrib_pointer[WES_ANORMAL].vbo_id = vbo_bkp_id;
+#ifndef WES_WEBGL
+	if( vbo_bkp_id )
 #endif
+	wes_gl->glVertexAttribPointer(WES_ANORMAL, 3, type, GL_FALSE, stride, ptr);
 }
 
 GLvoid
@@ -821,9 +825,11 @@ glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_ACOLOR0].type = type;
     vt_attrib_pointer[WES_ACOLOR0].stride = stride;
     vt_attrib_pointer[WES_ACOLOR0].ptr = ptr;
-#ifndef WES_VBO
-	wes_gl->glVertexAttribPointer(WES_ACOLOR0, size, type, GL_TRUE, stride, ptr);
+	vt_attrib_pointer[WES_ACOLOR0].vbo_id = vbo_bkp_id;
+#ifndef WES_WEBGL
+	if( vbo_bkp_id )
 #endif
+	wes_gl->glVertexAttribPointer(WES_ACOLOR0, size, type, GL_TRUE, stride, ptr);
 }
 
 GLvoid
@@ -836,9 +842,12 @@ glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[i].type = type;
     vt_attrib_pointer[i].stride = stride;
     vt_attrib_pointer[i].ptr = ptr;
-#ifndef WES_VBO
-	wes_gl->glVertexAttribPointer(i, size, type, GL_FALSE, stride, ptr);
+	vt_attrib_pointer[i].vbo_id = vbo_bkp_id;
+#ifndef WES_WEBGL
+	if( vbo_bkp_id )
 #endif
+	wes_gl->glVertexAttribPointer(i, size, type, GL_FALSE, stride, ptr);
+
 }
 
 GLvoid
@@ -850,6 +859,10 @@ glSecondaryColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *p
     vt_attrib_pointer[WES_ACOLOR1].type = type;
     vt_attrib_pointer[WES_ACOLOR1].stride = stride;
     vt_attrib_pointer[WES_ACOLOR1].ptr = ptr;
+	vt_attrib_pointer[WES_ACOLOR1].vbo_id = vbo_bkp_id;
+#ifndef WES_WEBGL
+	if( vbo_bkp_id )
+#endif
     wes_gl->glVertexAttribPointer(WES_ACOLOR1, size, type, GL_FALSE, stride, ptr);
 }
 
@@ -862,6 +875,10 @@ glFogCoordPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_AFOGCOORD].type = type;
     vt_attrib_pointer[WES_AFOGCOORD].stride = stride;
     vt_attrib_pointer[WES_AFOGCOORD].ptr = ptr;
+	vt_attrib_pointer[WES_AFOGCOORD].vbo_id = vbo_bkp_id;
+#ifndef WES_WEBGL
+	if( vbo_bkp_id )
+#endif
     wes_gl->glVertexAttribPointer(WES_AFOGCOORD, 1, type, GL_FALSE, stride, ptr);
 }
 
@@ -1153,21 +1170,14 @@ GLvoid glPolygonOffset( GLfloat factor, GLfloat units )
 	wes_vertbuffer_flush();
 	wes_gl->glPolygonOffset(factor, units);
 }
-#ifdef WES_VBO
+#ifdef WES_WEBGL
 static void wes_vertex_attrib_pointer(int i, int count, GLboolean norm)
 {
-	if(!vt_attrib_pointer[i].isenabled)
+	if( !vt_attrib_pointer[i].isenabled || vt_attrib_pointer[i].vbo_id )
 		return;
-	if( skipnanogl )
-	{
-		//wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].vboid );
-		//wes_gl->glBufferData(GL_ARRAY_BUFFER, count , (void*)vt_attrib_pointer[i].ptr, GL_STREAM_DRAW);
-		wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride,vt_attrib_pointer[i].ptr);
-		return;
-	}
-	if( !vt_attrib_pointer[i].vboid )
-		wes_gl->glGenBuffers(1, &vt_attrib_pointer[i].vboid );
-	wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].vboid );
+	if( !vt_attrib_pointer[i].webgl_vbo_id )
+		wes_gl->glGenBuffers(1, &vt_attrib_pointer[i].webgl_vbo_id );
+	wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].webgl_vbo_id );
 	wes_gl->glBufferData(GL_ARRAY_BUFFER, count , (void*)vt_attrib_pointer[i].ptr, GL_STREAM_DRAW);
 	wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride,0);
 
@@ -1531,8 +1541,8 @@ glPolygonMode( GLenum face, GLenum mode )
 
 void glBindBufferARB( GLuint target, GLuint index )
 {
-	if( index && !vbo_bkp_id && !skipnanogl )
-		FlushOnStateChange();
+//	if( index && !vbo_bkp_id && !skipnanogl )
+	//	FlushOnStateChange();
 	glDisableClientState( GL_COLOR_ARRAY );
 	glColor4f( 1,1,1,1 );
 

@@ -59,8 +59,9 @@ struct attrib_ptr_s {
     GLenum      type;
     GLsizei     stride;
     const GLvoid *ptr;
-#ifdef WES_VBO
-	GLuint vboid;
+	GLuint vbo_id;
+#ifdef WES_WEBGL
+	GLuint webgl_vbo_id;
 #endif
 };
 
