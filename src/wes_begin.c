@@ -294,20 +294,6 @@ glBegin(GLenum mode)
 }
 
 
-#ifdef WES_WEBGL
-static void wes_vertex_attrib_pointer(int i, int count, GLboolean norm)
-{
-	if( !vt_attrib_pointer[i].isenabled || vt_attrib_pointer[i].vbo_id )
-		return;
-	if( !vt_attrib_pointer[i].webgl_vbo_id )
-		wes_gl->glGenBuffers(1, &vt_attrib_pointer[i].webgl_vbo_id );
-	wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].webgl_vbo_id );
-	wes_gl->glBufferData(GL_ARRAY_BUFFER, count , (void*)vt_attrib_pointer[i].ptr, GL_STREAM_DRAW);
-	wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride,0);
-
-}
-#endif
-
 //glVertex
 GLvoid
 glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
@@ -1161,6 +1147,42 @@ glActiveTextureARB(GLenum texture)
 	u_activetex = vt_clienttex;
 }
 
+
+#ifdef WES_WEBGL
+static void wes_vertex_attrib_pointer(int i, int count, GLboolean norm)
+{
+	long ptrdiff;
+	int stride;
+
+	if( !vt_attrib_pointer[i].isenabled || vt_attrib_pointer[i].vbo_id )
+		return;
+	if( !vt_attrib_pointer[i].webgl_vbo_id )
+		wes_gl->glGenBuffers(1, &vt_attrib_pointer[i].webgl_vbo_id );
+	ptrdiff = (char*)vt_attrib_pointer[i].ptr - (char*)vt_attrib_pointer[0].ptr;
+	stride = vt_attrib_pointer[i].stride;
+	if( stride == 0 )
+	{
+		if( vt_attrib_pointer[i].type == GL_UNSIGNED_BYTE )
+			stride = vt_attrib_pointer[i].size;
+		else
+			stride = vt_attrib_pointer[i].size * 4;
+	}
+	if( i && vt_attrib_pointer[0].isenabled && !vt_attrib_pointer[0].vbo_id && ptrdiff > 0 && ptrdiff < stride )
+	{
+		// reuse existing array
+		wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[0].webgl_vbo_id );
+		wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride, ptrdiff);
+	}
+	else
+	{
+		wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].webgl_vbo_id );
+		wes_gl->glBufferData( GL_ARRAY_BUFFER, (count + 4) * stride, (void*)vt_attrib_pointer[i].ptr, GL_STREAM_DRAW);
+		wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride, 0);
+	}
+}
+#endif
+
+
 GLvoid
 glDrawArrays(GLenum mode, GLint off, GLint num)
 {
@@ -1168,13 +1190,14 @@ glDrawArrays(GLenum mode, GLint off, GLint num)
     wes_state_update();
 #ifdef WES_WEBGL
 	wes_state_update();
-	wes_vertex_attrib_pointer( WES_ATEXCOORD0, num * 8, GL_FALSE );
-	wes_vertex_attrib_pointer( WES_ATEXCOORD1, num * 8, GL_FALSE );
-	wes_vertex_attrib_pointer( WES_ATEXCOORD2, num * 8, GL_FALSE );
-	wes_vertex_attrib_pointer( WES_ATEXCOORD3, num * 8, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_APOS, off + num, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ACOLOR0, off + num, GL_TRUE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD0, off + num, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD1, off + num, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD2, off + num, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD3, off + num, GL_FALSE );
 
-	wes_vertex_attrib_pointer( WES_ACOLOR0, num*4, GL_TRUE );
-	wes_vertex_attrib_pointer( WES_APOS, num*12, GL_FALSE );
+
 #endif
 	wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vbo_bkp_id );
 	wes_gl->glDrawArrays(mode, off, num);
@@ -1221,13 +1244,13 @@ GLvoid glDrawRangeElements( GLenum mode, GLuint start, GLuint end, GLsizei count
 
 
 	wes_state_update();
-	wes_vertex_attrib_pointer( WES_ATEXCOORD0, end * 8, GL_FALSE );
-	wes_vertex_attrib_pointer( WES_ATEXCOORD1, end * 8, GL_FALSE );
-	wes_vertex_attrib_pointer( WES_ATEXCOORD2, end * 8, GL_FALSE );
-	wes_vertex_attrib_pointer( WES_ATEXCOORD3, end * 8, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_APOS, end, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ACOLOR0, end, GL_TRUE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD0, end, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD1, end, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD2, end, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD3, end, GL_FALSE );
 
-	wes_vertex_attrib_pointer( WES_ACOLOR0, end*4, GL_TRUE );
-	wes_vertex_attrib_pointer( WES_APOS, end*12, GL_FALSE );
 
 	wes_gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_id);
 	wes_gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * 2, indices, GL_STREAM_DRAW);
