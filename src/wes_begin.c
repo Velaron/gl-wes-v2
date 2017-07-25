@@ -93,11 +93,17 @@ wes_reset()
     for(i = 0; i < WES_ANUM; i++)
     {
         if (vt_attrib_pointer[i].isenabled){
+			arraysValid = 0;
             wes_gl->glEnableVertexAttribArray(i);
+			if( vt_attrib_pointer[i].vbo_id )
+				wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vt_attrib_pointer[i].vbo_id );
+			else
+				wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vt_attrib_pointer[i].webgl_vbo_id );
+
             wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type,
-                GL_FALSE, vt_attrib_pointer[i].stride, vt_attrib_pointer[i].ptr);
+				GL_FALSE, vt_attrib_pointer[i].stride, vt_attrib_pointer[i].vbo_id ?vt_attrib_pointer[i].ptr:NULL);
         } else {
-            wes_gl->glDisableVertexAttribArray(i);
+			//wes_gl->glDisableVertexAttribArray(i);
         }
     }
 }
@@ -123,7 +129,7 @@ wes_vertbuffer_flush()
 		wes_gl->glEnableVertexAttribArray(WES_APOS);
 		wes_gl->glVertexAttribPointer(WES_APOS, vt_possize, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)0);
 
-		//arraysValid = GL_TRUE;
+		arraysValid = GL_TRUE;
 	}
 
     if (vt_coordsize[0]){
@@ -137,21 +143,21 @@ wes_vertbuffer_flush()
     if (vt_coordsize[1]){
         wes_gl->glEnableVertexAttribArray(WES_ATEXCOORD1);
         wes_gl->glVertexAttribPointer(WES_ATEXCOORD1, vt_coordsize[1], GL_FLOAT, GL_FALSE, sizeof(vertex_t),
-            (GLfloat*)(vt_vbuffer) + WES_OFFSET_TEXCOORD1);
+				(void*)(WES_OFFSET_TEXCOORD1*sizeof(float)));
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ATEXCOORD1);
     }
     if (vt_coordsize[2]){
         wes_gl->glEnableVertexAttribArray(WES_ATEXCOORD2);
         wes_gl->glVertexAttribPointer(WES_ATEXCOORD2, vt_coordsize[2], GL_FLOAT, GL_FALSE, sizeof(vertex_t),
-            (GLfloat*)(vt_vbuffer) + WES_OFFSET_TEXCOORD2);
+				(void*)(WES_OFFSET_TEXCOORD2*sizeof(float)));
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ATEXCOORD2);
     }
     if (vt_coordsize[3]){
         wes_gl->glEnableVertexAttribArray(WES_ATEXCOORD3);
         wes_gl->glVertexAttribPointer(WES_ATEXCOORD3, vt_coordsize[3], GL_FLOAT, GL_FALSE, sizeof(vertex_t),
-            (GLfloat*)(vt_vbuffer) + WES_OFFSET_TEXCOORD3);
+				(void*)(WES_OFFSET_TEXCOORD3*sizeof(float)));
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ATEXCOORD3);
     }
@@ -179,15 +185,15 @@ wes_vertbuffer_flush()
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ACOLOR0);
     }
-/*
+
     if (vt_color1size){
         wes_gl->glEnableVertexAttribArray(WES_ACOLOR1);
         wes_gl->glVertexAttribPointer(WES_ACOLOR1, vt_color1size, GL_FLOAT, GL_FALSE, sizeof(vertex_t),
-            (GLfloat*)(vt_vbuffer) + WES_OFFSET_COLOR1);
+			(void*)(WES_OFFSET_COLOR1*sizeof(float)));
     } else {
         wes_gl->glDisableVertexAttribArray(WES_ACOLOR1);
     }
-*/
+
 
 	wes_gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_id);
 	wes_gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, vt_vertcount*sizeof(GLushort), vt_ibuffer, GL_STREAM_DRAW);
@@ -286,6 +292,21 @@ glBegin(GLenum mode)
     *vt_const = *vt_current;
 
 }
+
+
+#ifdef WES_WEBGL
+static void wes_vertex_attrib_pointer(int i, int count, GLboolean norm)
+{
+	if( !vt_attrib_pointer[i].isenabled || vt_attrib_pointer[i].vbo_id )
+		return;
+	if( !vt_attrib_pointer[i].webgl_vbo_id )
+		wes_gl->glGenBuffers(1, &vt_attrib_pointer[i].webgl_vbo_id );
+	wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].webgl_vbo_id );
+	wes_gl->glBufferData(GL_ARRAY_BUFFER, count , (void*)vt_attrib_pointer[i].ptr, GL_STREAM_DRAW);
+	wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride,0);
+
+}
+#endif
 
 //glVertex
 GLvoid
@@ -793,7 +814,8 @@ glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_APOS].stride = stride;
     vt_attrib_pointer[WES_APOS].ptr = ptr;
 	vt_attrib_pointer[WES_APOS].vbo_id = vbo_bkp_id;
-#ifndef WES_WEBGL
+#ifdef WES_WEBGL
+	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
 	if( vbo_bkp_id )
 #endif
 	wes_gl->glVertexAttribPointer(WES_APOS, size, type, GL_FALSE, stride, ptr);
@@ -810,7 +832,8 @@ glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_ANORMAL].stride = stride;
     vt_attrib_pointer[WES_ANORMAL].ptr = ptr;
 	vt_attrib_pointer[WES_ANORMAL].vbo_id = vbo_bkp_id;
-#ifndef WES_WEBGL
+#ifdef WES_WEBGL
+	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
 	if( vbo_bkp_id )
 #endif
 	wes_gl->glVertexAttribPointer(WES_ANORMAL, 3, type, GL_FALSE, stride, ptr);
@@ -826,7 +849,8 @@ glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_ACOLOR0].stride = stride;
     vt_attrib_pointer[WES_ACOLOR0].ptr = ptr;
 	vt_attrib_pointer[WES_ACOLOR0].vbo_id = vbo_bkp_id;
-#ifndef WES_WEBGL
+#ifdef WES_WEBGL
+	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
 	if( vbo_bkp_id )
 #endif
 	wes_gl->glVertexAttribPointer(WES_ACOLOR0, size, type, GL_TRUE, stride, ptr);
@@ -843,7 +867,8 @@ glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[i].stride = stride;
     vt_attrib_pointer[i].ptr = ptr;
 	vt_attrib_pointer[i].vbo_id = vbo_bkp_id;
-#ifndef WES_WEBGL
+#ifdef WES_WEBGL
+	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
 	if( vbo_bkp_id )
 #endif
 	wes_gl->glVertexAttribPointer(i, size, type, GL_FALSE, stride, ptr);
@@ -860,7 +885,8 @@ glSecondaryColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *p
     vt_attrib_pointer[WES_ACOLOR1].stride = stride;
     vt_attrib_pointer[WES_ACOLOR1].ptr = ptr;
 	vt_attrib_pointer[WES_ACOLOR1].vbo_id = vbo_bkp_id;
-#ifndef WES_WEBGL
+#ifdef WES_WEBGL
+	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
 	if( vbo_bkp_id )
 #endif
     wes_gl->glVertexAttribPointer(WES_ACOLOR1, size, type, GL_FALSE, stride, ptr);
@@ -876,7 +902,8 @@ glFogCoordPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
     vt_attrib_pointer[WES_AFOGCOORD].stride = stride;
     vt_attrib_pointer[WES_AFOGCOORD].ptr = ptr;
 	vt_attrib_pointer[WES_AFOGCOORD].vbo_id = vbo_bkp_id;
-#ifndef WES_WEBGL
+#ifdef WES_WEBGL
+	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
 	if( vbo_bkp_id )
 #endif
     wes_gl->glVertexAttribPointer(WES_AFOGCOORD, 1, type, GL_FALSE, stride, ptr);
@@ -1139,7 +1166,18 @@ glDrawArrays(GLenum mode, GLint off, GLint num)
 {
     wes_vertbuffer_flush();
     wes_state_update();
-    wes_gl->glDrawArrays(mode, off, num);
+#ifdef WES_WEBGL
+	wes_state_update();
+	wes_vertex_attrib_pointer( WES_ATEXCOORD0, num * 8, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD1, num * 8, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD2, num * 8, GL_FALSE );
+	wes_vertex_attrib_pointer( WES_ATEXCOORD3, num * 8, GL_FALSE );
+
+	wes_vertex_attrib_pointer( WES_ACOLOR0, num*4, GL_TRUE );
+	wes_vertex_attrib_pointer( WES_APOS, num*12, GL_FALSE );
+#endif
+	wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vbo_bkp_id );
+	wes_gl->glDrawArrays(mode, off, num);
 }
 
 /*
@@ -1171,22 +1209,10 @@ GLvoid glPolygonOffset( GLfloat factor, GLfloat units )
 	wes_gl->glPolygonOffset(factor, units);
 }
 #ifdef WES_WEBGL
-static void wes_vertex_attrib_pointer(int i, int count, GLboolean norm)
-{
-	if( !vt_attrib_pointer[i].isenabled || vt_attrib_pointer[i].vbo_id )
-		return;
-	if( !vt_attrib_pointer[i].webgl_vbo_id )
-		wes_gl->glGenBuffers(1, &vt_attrib_pointer[i].webgl_vbo_id );
-	wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].webgl_vbo_id );
-	wes_gl->glBufferData(GL_ARRAY_BUFFER, count , (void*)vt_attrib_pointer[i].ptr, GL_STREAM_DRAW);
-	wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride,0);
-
-}
-
 GLvoid glDrawRangeElements( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices )
 {
 	wes_vertbuffer_flush();
-	glClientActiveTexture( GL_TEXTURE0 );
+	//glClientActiveTexture( GL_TEXTURE0 );
 	if( wrapglState2.sgb )
 	{
 		wrapglState2.sfactor = GL_SRC_ALPHA;
@@ -1205,6 +1231,7 @@ GLvoid glDrawRangeElements( GLenum mode, GLuint start, GLuint end, GLsizei count
 
 	wes_gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_id);
 	wes_gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * 2, indices, GL_STREAM_DRAW);
+	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
 
 	wes_gl->glDrawElements(mode, count, type, 0);
 }
@@ -1217,7 +1244,7 @@ GLvoid glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *ind
 GLvoid glDrawElements( GLenum mode, GLsizei count, GLenum type, const GLvoid *indices )
 {
 	wes_vertbuffer_flush();
-	glClientActiveTexture( GL_TEXTURE0 );
+	//glClientActiveTexture( GL_TEXTURE0 );
 	wes_state_update();
 	wes_gl->glDrawElements(mode, count, type, indices);
 }
@@ -1546,8 +1573,8 @@ void glBindBufferARB( GLuint target, GLuint index )
 	glDisableClientState( GL_COLOR_ARRAY );
 	glColor4f( 1,1,1,1 );
 
-	if( index && !vbo_bkp_id && !skipnanogl )
-		wes_vertbuffer_flush();
+	//if( index && !vbo_bkp_id && !skipnanogl )
+		//wes_vertbuffer_flush();
 	skipnanogl = (!!index) || vboarray;
 	glEsImpl->glBindBuffer( target, index );
 	if( vbo_bkp_id && !index )
