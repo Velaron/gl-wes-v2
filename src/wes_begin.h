@@ -75,7 +75,6 @@ typedef struct
 	GLenum cullface;
 	GLenum sfactor;
 	GLenum dfactor;
-	GLboolean sgb;
 } wrapState2;
 
 extern wrapState2 wrapglState2;

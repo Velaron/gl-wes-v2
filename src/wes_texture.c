@@ -23,9 +23,21 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <string.h>
 #include "wes.h"
 #include "wes_gl_defines.h"
+#include "wes_begin.h"
 
 GLboolean need_mipmap = GL_FALSE;
 
+#if 0
+// use this to remember internalformat for TexSubImage
+typedef struct textureformat_s
+{
+	struct textureformat_s *next;
+	GLenum internalformat;
+	int texture;
+} textureformat_t;
+
+textureformat_t *textureformatlist;
+#endif
 GLvoid
 glTexParameteri (GLenum target, GLenum pname, GLint param)
 {
@@ -74,67 +86,137 @@ glTexParameterfv(	GLenum target, GLenum pname, const GLfloat *params)
 	glTexParameterf(target, pname, params[0]);
 }
 
-
 GLvoid
 wes_convert_BGR2RGB(const GLubyte* inb, GLubyte* outb, GLint size)
 {
-    int i;
-    for(i = 0; i < size; i += 3){
-        outb[i + 2] = inb[i];
-        outb[i + 1] = inb[i + 1];
-        outb[i] = inb[i + 2];
-    }
+	int i;
+	for(i = 0; i < size; i += 3){
+		outb[i + 2] = inb[i];
+		outb[i + 1] = inb[i + 1];
+		outb[i] = inb[i + 2];
+	}
 }
 
 GLvoid
 wes_convert_BGRA2RGBA(const GLubyte* inb, GLubyte* outb, GLint size)
 {
-    int i;
-    for(i = 0; i < size; i += 4){
-        outb[i + 2] = inb[i];
-        outb[i + 1] = inb[i + 1];
-        outb[i] = inb[i + 2];
-        outb[i + 3] = inb[i + 3];
-    }
+	int i;
+	for(i = 0; i < size; i += 4){
+		outb[i + 2] = inb[i];
+		outb[i + 1] = inb[i + 1];
+		outb[i] = inb[i + 2];
+		outb[i + 3] = inb[i + 3];
+	}
+}
+
+GLvoid
+wes_clear_alpha(const GLubyte* inb, GLubyte* outb, GLint size)
+{
+	int i;
+	for(i = 0; i < size; i += 4){
+		outb[i] = inb[i];
+		outb[i + 1] = inb[i + 1];
+		outb[i + 2] = inb[i + 2];
+		outb[i + 3] = 255;
+	}
+}
+
+GLvoid
+wes_convert_RGBA2RGB(const GLubyte* inb, GLubyte* outb, GLint insize, GLint outsize)
+{
+	int i, j;
+	for(i = 0, j = 0; i < insize && j < outsize; i += 4, j += 3){
+		outb[j] = inb[i];
+		outb[j + 1] = inb[i + 1];
+		outb[j + 2] = inb[i + 2];
+	}
 }
 
 GLvoid
 wes_convert_I2LA(const GLubyte* inb, GLubyte* outb, GLint size)
 {
-    int i;
-    for(i = 0; i < size; i += 1){
-        outb[i*2 + 1] = outb[i*2] = inb[i];
-    }
+	int i;
+	for(i = 0; i < size; i += 1){
+		outb[i*2 + 1] = outb[i*2] = inb[i];
+	}
+}
+#if 0
+
+void wes_addtextureformat(GLenum internalformat)
+{
+	textureformat_t *node;
+	for( node = textureformatlist; node; node = node->next )
+		if( node->texture == wrapglState2.boundtexture ) break;
+	if( !node )
+	{
+		node = malloc( sizeof(textureformat_t));
+		node->next = textureformatlist;
+		textureformatlist = node;
+		node->texture = wrapglState2.boundtexture;
+	}
+	node->internalformat = internalformat;
 }
 
+GLenum wes_gettextureformat()
+{
+	textureformat_t *node;
+
+	for( node = textureformatlist; node; node = node->next )
+		if( node->texture == wrapglState2.boundtexture )
+			return node->internalformat;
+	return 0;
+}
+
+void wes_deletetextureformat()
+{
+	textureformat_t *node;
+
+	for( node = textureformatlist; node && node->texture != wrapglState2.boundtexture; node = node->next );
+	if( node )
+		node->internalformat = 0;
+}
+#endif
 
 GLvoid
 glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height,
-           GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+		   GLint border, GLenum format, GLenum type, const GLvoid *pixels)
 {
-	wes_vertbuffer_flush(); //?
+	//wes_vertbuffer_flush(); //?
 
-    GLvoid* data = (GLvoid*) pixels;
+	GLvoid* data = (GLvoid*) pixels;
 
-    /* conversion routines */
+	/* conversion routines */
 	if (format == GL_BGR){
-        data = (GLvoid*) malloc(width * height * 3);
-        wes_convert_BGR2RGB((GLubyte*) pixels, (GLubyte*) data, width * height * 3);
-        format = GL_RGB;
-    } else if (format == GL_BGRA){
-        data = (GLvoid*) malloc(width * height * 4);
-        wes_convert_BGRA2RGBA((GLubyte*) pixels, (GLubyte*) data, width * height * 4);
-        format = GL_RGBA;
-    } else if (format == GL_INTENSITY){
-        data = (GLvoid*) malloc(width * height * 2);
-        wes_convert_I2LA((GLubyte*) pixels, (GLubyte*) data, width * height * 2);
-        format = GL_LUMINANCE_ALPHA;
+		data = (GLvoid*) malloc(width * height * 3);
+		wes_convert_BGR2RGB((GLubyte*) pixels, (GLubyte*) data, width * height * 3);
+		format = GL_RGB;
+	} else if (format == GL_BGRA){
+		data = (GLvoid*) malloc(width * height * 4);
+		wes_convert_BGRA2RGBA((GLubyte*) pixels, (GLubyte*) data, width * height * 4);
+		format = GL_RGBA;
+	} else if (format == GL_INTENSITY){
+		data = (GLvoid*) malloc(width * height * 2);
+		wes_convert_I2LA((GLubyte*) pixels, (GLubyte*) data, width * height * 2);
+		format = GL_LUMINANCE_ALPHA;
 	}
+	if(internalFormat == GL_RGB && format == GL_RGBA )
+	{
+		GLvoid *data2 = malloc(width * height * 4);
+		//wes_addtextureformat(internalFormat);
+		//wes_convert_RGBA2RGB((GLubyte*) data, (GLubyte*) data2, width * height * 4, width * height * 3);
 
-    wes_gl->glTexImage2D(target, level, format, width, height, 0, format, type, data);
+		wes_clear_alpha((GLubyte*) pixels, (GLubyte*) data2, width * height * 4);
+		if( data != pixels )
+			free(data);
+		data = data2;
+		//format = GL_RGBA;
+	}
+	//else wes_deletetextureformat();
 
-    if (data != pixels)
-        free(data);
+	wes_gl->glTexImage2D(target, level, format, width, height, 0, format, type, data);
+
+	if (data != pixels)
+		free(data);
 
 	if( need_mipmap )
 	{
@@ -147,6 +229,7 @@ glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, G
 GLvoid glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
 {
 	wes_gl->glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
+
 	if( need_mipmap )
 	{
 		wes_gl->glGenerateMipmap(target);

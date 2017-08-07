@@ -513,12 +513,10 @@ GLvoid
 glColor4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 {
     vt_color0size = 4;
-	if( wrapglState2.sgb )
-		r*=a,g*=a,b*=a;
     vt_ccurrent->cr0 = r;
     vt_ccurrent->cg0 = g;
     vt_ccurrent->cb0 = b;
-    vt_ccurrent->ca0 = a;
+	vt_ccurrent->ca0 = a;
 
     vt_current->cr0 = vt_ccurrent->cr0;
     vt_current->cg0 = vt_ccurrent->cg0;
@@ -565,13 +563,7 @@ glColor4ub(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
     vt_ccurrent->cr0 = r / 255.0f;// * ubtofloat;
     vt_ccurrent->cg0 = g / 255.0f;// * ubtofloat;
     vt_ccurrent->cb0 = b / 255.0f;// * ubtofloat;
-    vt_ccurrent->ca0 = a / 255.0f;// * ubtofloat;
-	if( wrapglState2.sgb )
-	{
-		vt_ccurrent->cr0 *= vt_ccurrent->ca0;
-		vt_ccurrent->cg0 *= vt_ccurrent->ca0;
-		vt_ccurrent->cb0 *= vt_ccurrent->ca0;
-	}
+	vt_ccurrent->ca0 = a / 255.0f;// * ubtofloat;
 
     vt_current->cr0 = vt_ccurrent->cr0;
     vt_current->cg0 = vt_ccurrent->cg0;
@@ -1252,13 +1244,6 @@ GLvoid glDrawRangeElements( GLenum mode, GLuint start, GLuint end, GLsizei count
 {
 	wes_vertbuffer_flush();
 
-	if( wrapglState2.sgb )
-	{
-		wrapglState2.sfactor = GL_SRC_ALPHA;
-		wes_gl->glBlendFunc( GL_SRC_ALPHA, GL_ONE );
-	}
-
-
 	wes_state_update();
 	wes_vertex_attrib_pointer( WES_APOS, end, GL_FALSE );
 	wes_vertex_attrib_pointer( WES_ACOLOR0, end, GL_TRUE );
@@ -1563,19 +1548,14 @@ GLvoid glCullFace (GLenum mode)
 
 GLvoid glBlendFunc (GLenum sfactor, GLenum dfactor)
 {
-	GLuint sgb = GL_FALSE;
 
-	if( sfactor == GL_SRC_ALPHA && dfactor == GL_ONE )
-		sfactor = GL_ONE, sgb = GL_TRUE;
-
-	if( sfactor == wrapglState2.sfactor && dfactor == wrapglState2.dfactor && wrapglState2.sgb == sgb )
+	if( sfactor == wrapglState2.sfactor && dfactor == wrapglState2.dfactor )
 		return;
 
 	wes_vertbuffer_flush();
 
     wrapglState2.sfactor = sfactor;
-    wrapglState2.dfactor = dfactor;
-	wrapglState2.sgb = sgb;
+	wrapglState2.dfactor = dfactor;
 
     wes_gl->glBlendFunc(sfactor, dfactor);
 }
