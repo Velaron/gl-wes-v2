@@ -199,7 +199,7 @@ glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, G
 		wes_convert_I2LA((GLubyte*) pixels, (GLubyte*) data, width * height * 2);
 		format = GL_LUMINANCE_ALPHA;
 	}
-	if(internalFormat == GL_RGB && format == GL_RGBA )
+	if(pixels && internalFormat == GL_RGB && format == GL_RGBA )
 	{
 		GLvoid *data2 = malloc(width * height * 4);
 		//wes_addtextureformat(internalFormat);

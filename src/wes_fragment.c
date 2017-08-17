@@ -381,9 +381,9 @@ wes_frag_combine(char *buff, progstate_t *s, int tex)
                 break;
 
             case WES_FUNC_DOT3_RGB:
-                str += sprintf(str, "lowp vec3 col0 = arg0.rgb - vec3(0.5);\n");
-                str += sprintf(str, "lowp vec3 col1 = arg1.rgb - vec3(0.5);\n");
-                str += sprintf(str, "gl_FragColor.rgb = vec3(4 * dot(col0, col1));\n");
+				str += sprintf(str, "lowp vec3 col0 = arg0.rgb - vec3(0.5);\n");
+				str += sprintf(str, "lowp vec3 col1 = arg1.rgb - vec3(0.5);\n");
+				str += sprintf(str, "gl_FragColor.rgb = vec3(4.0 * dot(col0, col1));\n");
                 break;
 
             /*ATI Extensions */

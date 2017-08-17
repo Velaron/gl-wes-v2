@@ -206,6 +206,7 @@ typedef float           GLclampf;
 typedef int             GLfixed;
 typedef int             GLclampx;
 typedef double          GLdouble;
+typedef double          GLclampd;
 
 /* GL types for handling large vertex buffer objects */
 typedef int             GLintptr;

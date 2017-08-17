@@ -65,7 +65,7 @@ void main(){\n\
 			}\n\
 		}\n\
 	}\n\
-}\n\ ";
+}\n";
 
 
 
@@ -337,6 +337,7 @@ wes_bind_program(program_t *p)
     sh_program->isbound = GL_TRUE;
     wes_gl->glUseProgram(sh_program->prog);
 }
+//#define SHADER_FILE "WES.vsh"
 
 GLvoid
 wes_choose_program(progstate_t *s)

@@ -874,7 +874,7 @@ glOrthof(float l, float r, float b, float t, float n, float f)
 
 }
 
-GLvoid glOrtho (GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat zNear, GLfloat zFar)
+GLvoid glOrtho (GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar)
 {
 	glOrthof(left,right,bottom,top, zNear,zFar);
 }

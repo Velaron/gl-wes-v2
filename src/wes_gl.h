@@ -250,7 +250,7 @@ extern GLvoid   glTranslatef(GLfloat x, GLfloat y, GLfloat z);
 extern GLvoid   glFrustrumf(GLfloat l, GLfloat r, GLfloat b, GLfloat t, GLfloat n, GLfloat f);
 #define         glFrustrum(l,r,b,t,n,f)     glFrustrumf((GLfloat)l,(GLfloat)r,(GLfloat)b,(GLfloat)t,(GLfloat)n,(GLfloat)f)
 extern GLvoid   glOrthof(GLfloat l, GLfloat r, GLfloat b, GLfloat t, GLfloat n, GLfloat f);
-#define         glOrtho(l,r,b,t,n,f)        glOrthof((GLfloat)l,(GLfloat)r,(GLfloat)b,(GLfloat)t,(GLfloat)n,(GLfloat)f)
+//#define         glOrtho(l,r,b,t,n,f)        glOrthof((GLfloat)l,(GLfloat)r,(GLfloat)b,(GLfloat)t,(GLfloat)n,(GLfloat)f)
 extern GLvoid   glActiveTexture(GLenum texture);
 extern GLvoid   glPushMatrix();
 extern GLvoid   glPopMatrix();
