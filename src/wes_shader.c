@@ -48,22 +48,22 @@ char *wesShaderTestStr = "/*\n\
 		Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n\
 		*/\n\
 		\n\
-		#define LIGHT_NUM                                               8\n\
-		#define CLIPPLANE_NUM                                   6\n\
-		#define MULTITEX_NUM                                    4\n\
-		#define FACE_NUM                                                2\n\
+		#define LIGHT_NUM      8\n\
+		#define CLIPPLANE_NUM     6\n\
+		#define MULTITEX_NUM     4\n\
+		#define FACE_NUM      2\n\
 		\n\
-		#define FACE_FRONT                                              0\n\
-		#define FACE_BACK                                               1\n\
+		#define FACE_FRONT      0\n\
+		#define FACE_BACK      1\n\
 		\n\
-		#define COLORMAT_AMBIENT                                0\n\
-		#define COLORMAT_DIFFUSE                                1\n\
-		#define COLORMAT_AMBIENT_AND_DIFFUSE    2\n\
-		#define COLORMAT_SPECULAR                               3\n\
-		#define COLORMAT_EMISSIVE                               4\n\
+		#define COLORMAT_AMBIENT    0\n\
+		#define COLORMAT_DIFFUSE    1\n\
+		#define COLORMAT_AMBIENT_AND_DIFFUSE 2\n\
+		#define COLORMAT_SPECULAR    3\n\
+		#define COLORMAT_EMISSIVE    4\n\
 		\n\
 		#define FUNC_NEVER                      0\n\
-		#define FUNC_LESS                       1\n\
+		#define FUNC_LESS                      1\n\
 		#define FUNC_EQUAL                      2\n\
 		#define FUNC_LEQUAL                     3\n\
 		#define FUNC_GREATER                    4\n\
@@ -71,92 +71,94 @@ char *wesShaderTestStr = "/*\n\
 		#define FUNC_GEQUAL                     6\n\
 		#define FUNC_ALWAYS                     7\n\
 		\n\
-		#define FOG_LINEAR                                              0\n\
-		#define FOG_EXP                                                 1\n\
-		#define FOG_EXP2                                                2\n\
+		#define FOG_LINEAR      0\n\
+		#define FOG_EXP       1\n\
+		#define FOG_EXP2      2\n\
 		\n\
-		#define GEN_OBJLINEAR                                   1\n\
-		#define GEN_EYELINEAR                                   2\n\
-		#define GEN_SPHEREMAP                                   3\n\
-		#define GEN_REFLECTMAP                                  4\n\
+		#define GEN_OBJLINEAR     1\n\
+		#define GEN_EYELINEAR     2\n\
+		#define GEN_SPHEREMAP     3\n\
+		#define GEN_REFLECTMAP     4\n\
 		\n\
 		struct sLight {\n\
-		highp vec4      Position;\n\
-		lowp vec4       ColorAmbient, ColorDiffuse, ColorSpec;\n\
-		highp vec3      Attenuation;    // Constant, Linear & Quadratic factors\n\
-		highp vec3      SpotDir;\n\
-		highp vec2      SpotVar;                // Spot Shinniness & Cutoff angle\n\
+		highp vec4  Position;\n\
+		lowp vec4  ColorAmbient, ColorDiffuse, ColorSpec;\n\
+		highp vec3  Attenuation;  // Constant, Linear & Quadratic factors\n\
+		highp vec3 SpotDir;\n\
+		highp vec2  SpotVar;  // Spot Shinniness & Cutoff angle\n\
 		};\n\
 		\n\
 		struct sMaterial {\n\
-		int             ColorMaterial;\n\
-		lowp vec4       ColorAmbient, ColorDiffuse, ColorSpec, ColorEmissive;\n\
-		float           SpecExponent;\n\
+		int   ColorMaterial;\n\
+		lowp vec4  ColorAmbient, ColorDiffuse, ColorSpec, ColorEmissive;\n\
+		float   SpecExponent;\n\
 		};\n\
 		\n\
 		struct sLightModel {\n\
-		lowp vec4       ColorAmbient;\n\
-		bool            TwoSided;\n\
-		bool            LocalViewer;\n\
-		int                     ColorControl;\n\
+		lowp vec4  ColorAmbient;\n\
+		bool  TwoSided;\n\
+		bool  LocalViewer;\n\
+		int   ColorControl;\n\
 		};\n\
 		\n\
 		//Attributes:\n\
-		attribute highp vec4    aPosition;\n\
+		attribute highp vec4  aPosition;\n\
 		attribute mediump vec4  aTexCoord0;\n\
 		attribute mediump vec4  aTexCoord1;\n\
 		attribute mediump vec4  aTexCoord2;\n\
 		attribute mediump vec4  aTexCoord3;\n\
-		attribute highp vec3    aNormal;\n\
-		attribute highp float   aFogCoord;\n\
-		attribute lowp vec4     aColor;\n\
-		attribute lowp vec4     aColor2nd;\n\
+		attribute highp vec3  aNormal;\n\
+		attribute highp float  aFogCoord;\n\
+		attribute lowp vec4  aColor;\n\
+		attribute lowp vec4  aColor2nd;\n\
 		\n\
 		//Uniforms:\n\
-		uniform bool                    uEnableRescaleNormal;\n\
-		uniform bool                    uEnableNormalize;\n\
+		uniform bool   uEnableRescaleNormal;\n\
+		uniform bool   uEnableNormalize;\n\
 		\n\
-		uniform highp mat4              uMVP;           //model-view-projection matrix\n\
-		uniform highp mat4              uMV;            //model-view matrix\n\
-		uniform highp mat3              uMVIT;          //model-view inverted & transformed matrix\n\
+		uniform highp mat4  uMVP;  //model-view-projection matrix\n\
+		uniform highp mat4  uMV;  //model-view matrix\n\
+		uniform highp mat3  uMVIT;  //model-view inverted & transformed matrix\n\
 		\n\
-		uniform bool                    uEnableFog;\n\
-		uniform bool                    uEnableFogCoord;\n\
-		uniform int                             uFogMode;\n\
-		uniform float                   uFogDensity, uFogStart, uFogEnd;\n\
+		uniform bool   uEnableFog;\n\
+		uniform bool   uEnableFogCoord;\n\
+		uniform int    uFogMode;\n\
+		uniform float   uFogDensity, uFogStart, uFogEnd;\n\
 		\n\
-		uniform bvec4                   uEnableTextureGen[MULTITEX_NUM];\n\
-		uniform ivec4                   uTexGenMode[MULTITEX_NUM];\n\
-		uniform mat4                    uTexGenMat[MULTITEX_NUM];\n\
+		uniform bvec4   uEnableTextureGen[MULTITEX_NUM];\n\
+		uniform ivec4   uTexGenMode[MULTITEX_NUM];\n\
+		uniform mat4   uTexGenMat[MULTITEX_NUM];\n\
 		\n\
-		uniform bool                    uEnableLighting;\n\
-		uniform bool                    uEnableLight[LIGHT_NUM];\n\
-		uniform bool                    uEnableColorMaterial;\n\
-		uniform sLight                  uLight[LIGHT_NUM];\n\
-		uniform sLightModel             uLightModel;\n\
-		uniform sMaterial               uMaterial[FACE_NUM];\n\
-		uniform float                   uRescaleFactor;\n\
+		uniform bool   uEnableLighting;\n\
+		uniform bool   uEnableLight[LIGHT_NUM];\n\
+		uniform bool   uEnableColorMaterial;\n\
+		uniform sLight   uLight[LIGHT_NUM];\n\
+		uniform sLightModel  uLightModel;\n\
+		uniform sMaterial  uMaterial[FACE_NUM];\n\
+		uniform float    uRescaleFactor;\n\
 		\n\
-		uniform bool                    uEnableClipPlane[CLIPPLANE_NUM];\n\
-		uniform highp vec4              uClipPlane[CLIPPLANE_NUM];\n\
+		uniform bool   uEnableClipPlane[CLIPPLANE_NUM];\n\
+		uniform highp vec4   uClipPlane[CLIPPLANE_NUM];\n\
 		\n\
 		//Varyings:\n\
-		varying lowp vec4               vColor;\n\
-		varying lowp vec2               vFactor;\n\
-		varying mediump vec4    vTexCoord[MULTITEX_NUM];\n\
+		varying lowp vec4   vColor;\n\
+		varying lowp vec2  vFactor;\n\
+		varying mediump vec4  vTexCoord[MULTITEX_NUM];\n\
 		\n\
 		\n\
 		//local variables:\n\
-		highp vec4                              lEye;\n\
-		highp vec3                              lNormal;\n\
-		lowp vec4                               lMaterialAmbient;\n\
-		lowp vec4                               lMaterialDiffuse;\n\
-		lowp vec4                               lMaterialSpecular;\n\
-		lowp vec4                               lMaterialEmissive;\n\
-		float                                   lMaterialSpecExponent;\n\
-		int                                             lFace;\n\
+		highp vec4    lEye;\n\
+		highp vec3    lNormal;\n\
+		lowp vec4    lMaterialAmbient;\n\
+		lowp vec4    lMaterialDiffuse;\n\
+		lowp vec4    lMaterialSpecular;\n\
+		lowp vec4    lMaterialEmissive;\n\
+		float     lMaterialSpecExponent;\n\
+		int      lFace;\n\
 		\n\
-		void ComputeTexGen(int i){\n\
+		void ComputeTexGen(){\n\
+		for(int i = 0; i < MULTITEX_NUM; i++){\n\
+		if (any(uEnableTextureGen[i])){\n\
 		\n\
 		if (uTexGenMode[i].x == GEN_OBJLINEAR){\n\
 		vec4 row = vec4((uTexGenMat[i])[0][0], (uTexGenMat[i])[1][0], (uTexGenMat[i])[2][0], (uTexGenMat[i])[3][0]);\n\
@@ -200,12 +202,15 @@ char *wesShaderTestStr = "/*\n\
 		r.z += 1.0;\n\
 		float m = 0.5 / length(r);\n\
 		\n\
-		if (uTexGenMode[i].x == GEN_SPHEREMAP)          {vTexCoord[i].x = (r.x * m) + 0.5;}\n\
-		if (uTexGenMode[i].y == GEN_SPHEREMAP)          {vTexCoord[i].y = (r.y * m) + 0.5;}\n\
-		if (uTexGenMode[i].x == GEN_REFLECTMAP)         {vTexCoord[i].x = r.x;}\n\
-		if (uTexGenMode[i].y == GEN_REFLECTMAP)         {vTexCoord[i].y = r.y;}\n\
-		if (uTexGenMode[i].z == GEN_REFLECTMAP)         {vTexCoord[i].z = r.z;}\n\
+		if (uTexGenMode[i].x == GEN_SPHEREMAP)  {vTexCoord[i].x = (r.x * m) + 0.5;}\n\
+		if (uTexGenMode[i].y == GEN_SPHEREMAP)  {vTexCoord[i].y = (r.y * m) + 0.5;}\n\
+		if (uTexGenMode[i].x == GEN_REFLECTMAP)  {vTexCoord[i].x = r.x;}\n\
+		if (uTexGenMode[i].y == GEN_REFLECTMAP)  {vTexCoord[i].y = r.y;}\n\
+		if (uTexGenMode[i].z == GEN_REFLECTMAP)  {vTexCoord[i].z = r.z;}\n\
 		}\n\
+		}\n\
+		}\n\
+		\n\
 		}\n\
 		\n\
 		void ComputeFog(float dist){\n\
@@ -221,11 +226,11 @@ char *wesShaderTestStr = "/*\n\
 		}\n\
 		\n\
 		vec4 ComputeLightFrom(int i){\n\
-		highp vec3      dpos;\n\
-		highp vec4      col;\n\
-		float   dist, dist2, spot;\n\
-		float   att;\n\
-		float   ndoth, ndotl;\n\
+		highp vec3  dpos;\n\
+		highp vec4 col;\n\
+		float  dist, dist2, spot;\n\
+		float  att;\n\
+		float  ndoth, ndotl;\n\
 		\n\
 		dpos = uLight[i].Position.xyz;\n\
 		att = 1.0;\n\
@@ -269,7 +274,7 @@ char *wesShaderTestStr = "/*\n\
 		\n\
 		void ComputeLighting(){\n\
 		\n\
-		/*      Determine Face  */\n\
+		/*  Determine Face  */\n\
 		if (uLightModel.TwoSided){\n\
 		if (lNormal.z > 0.0){\n\
 		lFace = FACE_FRONT;\n\
@@ -281,7 +286,7 @@ char *wesShaderTestStr = "/*\n\
 		lFace = FACE_FRONT;\n\
 		}\n\
 		\n\
-		/* Determine which materials are to be used     */\n\
+		/* Determine which materials are to be used */\n\
 		lMaterialAmbient = uMaterial[lFace].ColorAmbient;\n\
 		lMaterialDiffuse = uMaterial[lFace].ColorDiffuse;\n\
 		lMaterialSpecular = uMaterial[lFace].ColorSpec;\n\
@@ -323,14 +328,14 @@ char *wesShaderTestStr = "/*\n\
 		lNormal = normalize(lNormal);\n\
 		}\n\
 		\n\
-		/* Lighting     */\n\
+		/* Lighting  */\n\
 		if (uEnableLighting){\n\
 		ComputeLighting();\n\
 		} else {\n\
 		vColor = aColor;\n\
 		}\n\
 		\n\
-		/* Fog                  */\n\
+		/* Fog   */\n\
 		vFactor.x = 1.0;\n\
 		if (uEnableFog){\n\
 		if (uEnableFogCoord){\n\
@@ -340,18 +345,14 @@ char *wesShaderTestStr = "/*\n\
 		}\n\
 		}\n\
 		\n\
-		/* Tex Coord Generators         */\n\
+		/* Tex Coord Generators  */\n\
 		vTexCoord[0] = aTexCoord0;\n\
 		vTexCoord[1] = aTexCoord1;\n\
 		vTexCoord[2] = aTexCoord2;\n\
 		vTexCoord[3] = aTexCoord3;\n\
-		for(int i = 0; i < MULTITEX_NUM; i++){\n\
-		if (any(uEnableTextureGen[i])){\n\
-		ComputeTexGen(i);\n\
-		}\n\
-		}\n\
+		ComputeTexGen();\n\
 		\n\
-		/* Clip Planes  */\n\
+		/* Clip Planes */\n\
 		vFactor.y = 1.0;\n\
 		for(int i = 0; i < CLIPPLANE_NUM; i++){\n\
 		if (uEnableClipPlane[i]){\n\
@@ -362,6 +363,47 @@ char *wesShaderTestStr = "/*\n\
 		}\n\
 		}\n\
 ";
+
+GLboolean	sh_fallback;
+char *wesShaderFallbackStr =
+	"attribute highp vec4 	aPosition;\n\
+	attribute lowp vec4 	aColor;\n\
+	attribute mediump vec4 	aTexCoord0;\n\
+	attribute mediump vec4 	aTexCoord1;\n\
+	attribute mediump vec4 	aTexCoord2;\n\
+	attribute mediump vec4 	aTexCoord3;\n\
+	uniform highp mat4		uMVP;		//model-view-projection matrix\n\
+	uniform highp mat4		uMV;		//model-view matrix\n\
+	uniform highp mat3		uMVIT;		//model-view inverted & transformed matrix \n\
+	uniform	bool			uEnableClipPlane[6];\n\
+	uniform highp vec4 		uClipPlane[6];\n\
+	\n\
+	varying lowp vec4 		vColor;\n\
+	varying lowp vec2		vFactor;\n\
+	varying mediump vec4 	vTexCoord[4];\n\
+	\n\
+	highp vec4				lEye;\n\
+	\n\
+	void main(){\n\
+		gl_Position = uMVP * aPosition;\n\
+		lEye = uMV * aPosition;\n\
+		vColor = aColor;\n\
+		vTexCoord[0] = aTexCoord0;\n\
+		vTexCoord[1] = aTexCoord1;\n\
+		vTexCoord[2] = aTexCoord2;\n\
+		vTexCoord[3] = aTexCoord3;\n\
+		vFactor.x = 1.0;\n\
+		vFactor.y = 1.0;\n\
+	\n\
+		for(int i = 0; i < 6; i++){\n\
+			if (uEnableClipPlane[i]){\n\
+				if (dot(lEye, uClipPlane[i]) < 0.0){\n\
+					vFactor.y = 0.0;\n\
+				}\n\
+			}\n\
+		}\n\
+	}\n\ ";
+
 
 
 
@@ -731,6 +773,15 @@ wes_shader_init()
 #endif
 	//LOGI("Shader = %s", data);
 	sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
+	if(sh_vertex == 0xFFFFFFFF)
+	{
+		free(data);
+		data = (char*) malloc(strlen(wesShaderFallbackStr) + 1);
+		strcpy(data, wesShaderFallbackStr);
+		sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
+		sh_fallback = GL_TRUE;
+	}
+
 	LOGI("after shader create");
 	free(data);
 	LOGI("free");

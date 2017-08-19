@@ -215,32 +215,35 @@ wes_state_update()
     int i;
 
     wes_choose_program(&u_progstate);
-
-    UpdateUniform1i(uEnableRescaleNormal);
-    UpdateUniform1i(uEnableNormalize);
+	if( !sh_fallback )
+	{
+		UpdateUniform1i(uEnableRescaleNormal);
+		UpdateUniform1i(uEnableNormalize);
+	}
 
     for(i = 0; i != WES_CLIPPLANE_NUM; i++){
         UpdateUniform1i(uEnableClipPlane[i]);
         UpdateUniform4f(uClipPlane[i]);
     }
 
-#if 1
-    UpdateUniform1i(uEnableColorMaterial);
-    UpdateUniform1i(uEnableFog);
-    UpdateUniform1i(uEnableFogCoord);
-    UpdateUniform1i(uEnableLighting);
+	if( !sh_fallback )
+	{
+		UpdateUniform1i(uEnableColorMaterial);
+		UpdateUniform1i(uEnableFog);
+		UpdateUniform1i(uEnableFogCoord);
+		UpdateUniform1i(uEnableLighting);
 
-    for(i = 0; i != WES_LIGHT_NUM; i++){
-        UpdateUniform1i(uEnableLight[i]);
-        UpdateUniform4f(uLight[i].Position);
-        UpdateUniform3f(uLight[i].Attenuation);
-        UpdateUniform4f(uLight[i].ColorAmbient);
-        UpdateUniform4f(uLight[i].ColorDiffuse);
-        UpdateUniform4f(uLight[i].ColorSpec);
-        UpdateUniform3f(uLight[i].SpotDir);
-        UpdateUniform2f(uLight[i].SpotVar);
-    }
-#endif
+		for(i = 0; i != WES_LIGHT_NUM; i++){
+			UpdateUniform1i(uEnableLight[i]);
+			UpdateUniform4f(uLight[i].Position);
+			UpdateUniform3f(uLight[i].Attenuation);
+			UpdateUniform4f(uLight[i].ColorAmbient);
+			UpdateUniform4f(uLight[i].ColorDiffuse);
+			UpdateUniform4f(uLight[i].ColorSpec);
+			UpdateUniform3f(uLight[i].SpotDir);
+			UpdateUniform2f(uLight[i].SpotVar);
+		}
+	}
 
     for(i = 0; i < WES_MULTITEX_NUM; i++){
 	   // UpdateUniform4i(uEnableTextureGen[i]);
@@ -248,33 +251,35 @@ wes_state_update()
         UpdateUniform4f(uTexEnvColor[i]);
     }
 
-#if 1
-    UpdateUniform1f(uRescaleFactor);
+	if( !sh_fallback )
+	{
+		UpdateUniform1f(uRescaleFactor);
 
-    for(i = 0; i != WES_FACE_NUM; i++){
-        UpdateUniform1i(uMaterial[i].ColorMaterial);
-        UpdateUniform4f(uMaterial[i].ColorAmbient);
-        UpdateUniform4f(uMaterial[i].ColorDiffuse);
-        UpdateUniform4f(uMaterial[i].ColorSpec);
-        UpdateUniform4f(uMaterial[i].ColorEmissive);
-        UpdateUniform1f(uMaterial[i].SpecExponent);
-    }
+		for(i = 0; i != WES_FACE_NUM; i++){
+			UpdateUniform1i(uMaterial[i].ColorMaterial);
+			UpdateUniform4f(uMaterial[i].ColorAmbient);
+			UpdateUniform4f(uMaterial[i].ColorDiffuse);
+			UpdateUniform4f(uMaterial[i].ColorSpec);
+			UpdateUniform4f(uMaterial[i].ColorEmissive);
+			UpdateUniform1f(uMaterial[i].SpecExponent);
+		}
 
 
 
-    UpdateUniform4f(uLightModel.ColorAmbient);
-    UpdateUniform1i(uLightModel.TwoSided);
-    UpdateUniform1i(uLightModel.LocalViewer);
-    UpdateUniform1i(uLightModel.ColorControl);
-#endif
+		UpdateUniform4f(uLightModel.ColorAmbient);
+		UpdateUniform1i(uLightModel.TwoSided);
+		UpdateUniform1i(uLightModel.LocalViewer);
+		UpdateUniform1i(uLightModel.ColorControl);
+	}
 
-#if 1
-    UpdateUniform1i(uFogMode);
-    UpdateUniform1f(uFogDensity);
-    UpdateUniform1f(uFogStart);
-    UpdateUniform1f(uFogEnd);
-    UpdateUniform4f(uFogColor);
-#endif
+	if( !sh_fallback )
+	{
+		UpdateUniform1i(uFogMode);
+		UpdateUniform1f(uFogDensity);
+		UpdateUniform1f(uFogStart);
+		UpdateUniform1f(uFogEnd);
+		UpdateUniform4f(uFogColor);
+	}
     UpdateUniform1f(uAlphaRef);
 
 

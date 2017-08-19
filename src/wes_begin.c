@@ -799,14 +799,17 @@ rev=0;
 		wes_vertbuffer_flush();
 }
 
-void wes_validate_pointers()
+#ifdef WES_WEBGL
+#define wes_validate_pointers() arraysValid = GL_FALSE
+#else
+static inline void wes_validate_pointers()
 {
 	int i;
 	arraysValid = GL_FALSE;
 
 	if( pointersValid )
 		return;
-
+#ifndef WES_WEBGL
 	for( i = 0; i < WES_ANUM; i++ )
 	{
 		if( vt_attrib_pointer[i].isenabled )
@@ -819,8 +822,10 @@ void wes_validate_pointers()
 			wes_gl->glDisableVertexAttribArray(i);
 	}
 	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
+#endif
 	pointersValid = GL_TRUE;
 }
+#endif
 
 GLvoid
 glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)

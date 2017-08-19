@@ -178,6 +178,7 @@ struct program_s
 extern program_t    *sh_program;
 extern GLboolean    sh_program_mod;
 extern GLuint        sh_vertex;
+extern GLboolean	sh_fallback;
 
 extern GLvoid       wes_shader_init();
 extern GLvoid       wes_shader_destroy();
