@@ -52,7 +52,6 @@ struct vertex_s {
         GLfloat s, t, r, q;
     } coord[WES_MULTITEX_NUM];
 };
-
 struct attrib_ptr_s {
     GLboolean   isenabled;
     GLint       size;

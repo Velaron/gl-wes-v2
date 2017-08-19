@@ -71,13 +71,13 @@ static wrapState2 wrapglInitState2 =
 	GL_ONE,                          
     GL_ZERO,
 };
-
 #ifdef WES_WEBGL
 //vbo
 GLuint vbo_id;
 GLuint ibo_id;
 //
 #endif
+
 
 GLvoid
 wes_reset()
@@ -799,9 +799,7 @@ rev=0;
 		wes_vertbuffer_flush();
 }
 
-#ifdef WES_WEBGL
-#define wes_validate_pointers() arraysValid = GL_FALSE
-#else
+
 static inline void wes_validate_pointers()
 {
 	int i;
@@ -822,10 +820,17 @@ static inline void wes_validate_pointers()
 			wes_gl->glDisableVertexAttribArray(i);
 	}
 	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
+#else
+	for( i = 0; i < WES_ANUM; i++ )
+	{
+		if( vt_attrib_pointer[i].isenabled )
+			wes_gl->glEnableVertexAttribArray(i);
+		else
+			wes_gl->glDisableVertexAttribArray(i);
+	}
 #endif
 	pointersValid = GL_TRUE;
 }
-#endif
 
 GLvoid
 glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
@@ -1186,8 +1191,8 @@ glClientActiveTextureARB(GLenum texture)
 GLvoid
 glActiveTextureARB(GLenum texture)
 {
-	//wes_vertbuffer_flush();
-	//vt_clienttex = texture - GL_TEXTURE0;
+	wes_vertbuffer_flush();
+	vt_clienttex = texture - GL_TEXTURE0;
 	wes_gl->glActiveTexture( texture );
 	u_activetex = texture - GL_TEXTURE0;
 }
@@ -1230,6 +1235,7 @@ static void wes_vertex_attrib_pointer(int i, int count, GLboolean norm)
 	else
 	{
 		wes_gl->glBindBuffer( GL_ARRAY_BUFFER, vt_attrib_pointer[i].webgl_vbo_id );
+		//printf("BufferData %d %d\n",vt_attrib_pointer[i].webgl_vbo_id, (count + 4) * stride );
 		wes_gl->glBufferData( GL_ARRAY_BUFFER, (count + 4) * stride, (void*)vt_attrib_pointer[i].ptr, GL_STREAM_DRAW);
 		wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, norm, vt_attrib_pointer[i].stride, 0);
 	}
