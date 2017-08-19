@@ -43,6 +43,7 @@ GLuint          vt_possize, vt_color0size, vt_color1size,
 vertex_t 		vt_ccurrent[1];
 
 GLboolean arraysValid = GL_FALSE;
+GLboolean pointersValid = GL_TRUE;
 
 GLuint 		vt_vertcount = 0;
 GLuint 		vt_indexarray = 0;
@@ -207,6 +208,7 @@ wes_vertbuffer_flush()
 
 
 		arraysValid = GL_TRUE;
+		pointersValid = GL_FALSE;
 	}
 #ifdef WES_WEBGL
 	wes_gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_id);
@@ -217,8 +219,6 @@ wes_vertbuffer_flush()
 
 	wes_gl->glDrawElements(GL_TRIANGLES, vt_vertcount, GL_UNSIGNED_SHORT, (void*)INDEX_START);
 
-	//wes_gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//wes_gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
     wes_reset();
 }
@@ -799,6 +799,29 @@ rev=0;
 		wes_vertbuffer_flush();
 }
 
+void wes_validate_pointers()
+{
+	int i;
+	arraysValid = GL_FALSE;
+
+	if( pointersValid )
+		return;
+
+	for( i = 0; i < WES_ANUM; i++ )
+	{
+		if( vt_attrib_pointer[i].isenabled )
+		{
+			wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vt_attrib_pointer[i].vbo_id);
+			wes_gl->glEnableVertexAttribArray(i);
+			wes_gl->glVertexAttribPointer(i, vt_attrib_pointer[i].size, vt_attrib_pointer[i].type, i == WES_ACOLOR0 || i == WES_ACOLOR1, vt_attrib_pointer[i].stride, vt_attrib_pointer[i].ptr);
+		}
+		else
+			wes_gl->glDisableVertexAttribArray(i);
+	}
+	wes_gl->glBindBuffer(GL_ARRAY_BUFFER, vbo_bkp_id);
+	pointersValid = GL_TRUE;
+}
+
 GLvoid
 glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
 {
@@ -814,7 +837,7 @@ glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
 	if( vbo_bkp_id )
 #endif
 	wes_gl->glVertexAttribPointer(WES_APOS, size, type, GL_FALSE, stride, ptr);
-	arraysValid = GL_FALSE;
+	wes_validate_pointers();
 }
 
 GLvoid
@@ -832,7 +855,7 @@ glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
 	if( vbo_bkp_id )
 #endif
 	wes_gl->glVertexAttribPointer(WES_ANORMAL, 3, type, GL_FALSE, stride, ptr);
-	arraysValid = GL_FALSE;
+	wes_validate_pointers();
 }
 
 GLvoid
@@ -850,7 +873,7 @@ glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
 	if( vbo_bkp_id )
 #endif
 	wes_gl->glVertexAttribPointer(WES_ACOLOR0, size, type, GL_TRUE, stride, ptr);
-	arraysValid = GL_FALSE;
+	wes_validate_pointers();
 }
 
 GLvoid
@@ -869,7 +892,7 @@ glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
 	if( vbo_bkp_id )
 #endif
 	wes_gl->glVertexAttribPointer(i, size, type, GL_FALSE, stride, ptr);
-	arraysValid = GL_FALSE;
+	wes_validate_pointers();
 }
 
 GLvoid
@@ -887,7 +910,7 @@ glSecondaryColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *p
 	if( vbo_bkp_id )
 #endif
     wes_gl->glVertexAttribPointer(WES_ACOLOR1, size, type, GL_FALSE, stride, ptr);
-	arraysValid = GL_FALSE;
+	wes_validate_pointers();
 }
 
 GLvoid
@@ -905,7 +928,7 @@ glFogCoordPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
 	if( vbo_bkp_id )
 #endif
     wes_gl->glVertexAttribPointer(WES_AFOGCOORD, 1, type, GL_FALSE, stride, ptr);
-	arraysValid = GL_FALSE;
+	wes_validate_pointers();
 }
 
 GLvoid
@@ -947,14 +970,13 @@ glEnableClientState(GLenum array)
             PRINT_ERROR("EnableClientState Unhandled enum");
     }
 
+	wes_validate_pointers();
 }
 
 GLvoid
 glDisableClientState(GLenum array)
 {
 	//wes_vertbuffer_flush(); //?
-
-	arraysValid = GL_FALSE;
 
     switch(array)
     {
@@ -987,6 +1009,8 @@ glDisableClientState(GLenum array)
         default:
             PRINT_ERROR("DisableClientState Unhandled enum");
     }
+
+	wes_validate_pointers();
 }
 
 GLvoid
@@ -1157,10 +1181,10 @@ glClientActiveTextureARB(GLenum texture)
 GLvoid
 glActiveTextureARB(GLenum texture)
 {
-	wes_vertbuffer_flush();
-	vt_clienttex = texture - GL_TEXTURE0;
+	//wes_vertbuffer_flush();
+	//vt_clienttex = texture - GL_TEXTURE0;
 	wes_gl->glActiveTexture( texture );
-	u_activetex = vt_clienttex;
+	u_activetex = texture - GL_TEXTURE0;
 }
 
 
@@ -1288,6 +1312,7 @@ GLvoid glDrawElements( GLenum mode, GLsizei count, GLenum type, const GLvoid *in
 	wes_vertbuffer_flush();
 	//glClientActiveTexture( GL_TEXTURE0 );
 	wes_state_update();
+	wes_validate_pointers();
 	wes_gl->glDrawElements(mode, count, type, indices);
 }
 GLvoid glDrawRangeElements( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices )
@@ -1295,6 +1320,7 @@ GLvoid glDrawRangeElements( GLenum mode, GLuint start, GLuint end, GLsizei count
 	wes_vertbuffer_flush();
 	//glClientActiveTexture( GL_TEXTURE0 );
 	wes_state_update();
+	wes_validate_pointers();
 	wes_gl->glDrawElements(mode, count, type, indices);
 }
 #endif
@@ -1622,7 +1648,7 @@ void glBindBufferARB( GLuint target, GLuint index )
 	// prevent breaking our arrays by flush calls
 	skipnanogl = (!!index) || vboarray;
 	glEsImpl->glBindBuffer( target, index );
-	printf("glBindBufferARB %x %d\n", target, index );
+	//printf("glBindBufferARB %x %d\n", target, index );
 	if( vbo_bkp_id && !index )
 	{
 		arraysValid = GL_FALSE;

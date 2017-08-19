@@ -224,13 +224,11 @@ wes_state_update()
         UpdateUniform4f(uClipPlane[i]);
     }
 
-
+#if 1
     UpdateUniform1i(uEnableColorMaterial);
     UpdateUniform1i(uEnableFog);
     UpdateUniform1i(uEnableFogCoord);
     UpdateUniform1i(uEnableLighting);
-
-
 
     for(i = 0; i != WES_LIGHT_NUM; i++){
         UpdateUniform1i(uEnableLight[i]);
@@ -242,13 +240,15 @@ wes_state_update()
         UpdateUniform3f(uLight[i].SpotDir);
         UpdateUniform2f(uLight[i].SpotVar);
     }
+#endif
+
     for(i = 0; i < WES_MULTITEX_NUM; i++){
-        UpdateUniform4i(uEnableTextureGen[i]);
+	   // UpdateUniform4i(uEnableTextureGen[i]);
         UpdateUniform1i(uTexUnit[i]);
         UpdateUniform4f(uTexEnvColor[i]);
     }
 
-
+#if 1
     UpdateUniform1f(uRescaleFactor);
 
     for(i = 0; i != WES_FACE_NUM; i++){
@@ -266,15 +266,15 @@ wes_state_update()
     UpdateUniform1i(uLightModel.TwoSided);
     UpdateUniform1i(uLightModel.LocalViewer);
     UpdateUniform1i(uLightModel.ColorControl);
+#endif
 
-
-
+#if 1
     UpdateUniform1i(uFogMode);
     UpdateUniform1f(uFogDensity);
     UpdateUniform1f(uFogStart);
     UpdateUniform1f(uFogEnd);
     UpdateUniform4f(uFogColor);
-
+#endif
     UpdateUniform1f(uAlphaRef);
 
 
@@ -715,13 +715,14 @@ GLvoid wes_setstate (GLenum e, GLboolean b)
             {
                 wes_vertbuffer_flush();
 
-			   /* if (b)
+			   /*if (b)
 					wes_gl->glEnable(e);
         		else    
 					wes_gl->glDisable(e);
 				*/
 
                 u_progstate.uTexture[u_activetex].Enable = b;
+				wes_state_update();
                 return;
             }
             break;
@@ -1045,7 +1046,7 @@ glFogfv(GLenum pname, GLfloat *param)
     switch(pname)
     {
         case GL_FOG_COLOR:
-            SetUniform4fv(uFogColor, param); break;
+			SetUniform3fv(uFogColor, param); break;
     }
 }
 
