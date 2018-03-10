@@ -282,3 +282,9 @@ glMultiDrawElements(GLenum mode, GLsizei *count, GLenum type, GLvoid **indices, 
         }
     }
 }
+
+GLvoid
+glScissor (GLint x, GLint y, GLsizei width, GLsizei height)
+{
+	wes_gl->glScissor(x, y, width, height);
+}

@@ -402,7 +402,7 @@ char *wesShaderFallbackStr =
 				}\n\
 			}\n\
 		}\n\
-	}\n\ ";
+	}\n";
 
 
 
