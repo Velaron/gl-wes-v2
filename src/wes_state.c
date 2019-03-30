@@ -748,6 +748,34 @@ GLvoid wes_setstate (GLenum e, GLboolean b)
     }    
 }
 
+GLboolean wes_getstate (GLenum e)
+{
+    switch(e)
+    {
+        case GL_ALPHA_TEST: return wrapglState.alpha_test;
+        case GL_BLEND: return wrapglState.blend;
+        case GL_COLOR_MATERIAL: return wrapglState.color_material;
+        case GL_CULL_FACE: return wrapglState.cull_face;
+        case GL_DEPTH_TEST: return wrapglState.depth_test;
+        case GL_DITHER: return wrapglState.dither;
+		case GL_FOG: return u_progstate.uEnableFog; // UNSUPPORTED?
+        case GL_LIGHTING: return wrapglState.lighting;
+        case GL_NORMALIZE: return wrapglState.normalize;
+        case GL_POLYGON_OFFSET_FILL: return wrapglState.polygon_offset_fill;
+        case GL_RESCALE_NORMAL: return wrapglState.rescale_normal;
+        case GL_SAMPLE_ALPHA_TO_COVERAGE: return wrapglState.sample_alpha_to_coverage;
+        case GL_SAMPLE_COVERAGE: return wrapglState.sample_coverage;
+        case GL_SCISSOR_TEST: return wrapglState.scissor_test;
+        case GL_STENCIL_TEST: return GL_FALSE; // UNSUPPORTED!
+        case GL_TEXTURE_2D: return u_progstate.uTexture[u_activetex].Enable;
+		default: 
+			// LOGI("glIsEnabled: %x not implemented",e);
+			return wes_gl->glIsEnabled(e);
+            break;
+    }
+}
+
+
 GLvoid
 glLightf(GLenum light, GLenum pname, GLfloat params)
 {
@@ -978,6 +1006,12 @@ GLvoid
 glDisable(GLenum e)
 {
     wes_setstate(e, GL_FALSE);
+}
+
+GLboolean
+glIsEnabled(GLenum e)
+{
+	return wes_getstate(e);
 }
 
 GLvoid
