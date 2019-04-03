@@ -649,4 +649,10 @@ typedef int             GLsizeiptr;
 
 #define GL_INVALID_FRAMEBUFFER_OPERATION  0x0506
 
+/* OpenGL 1.1 */
+#define GL_RGB8                           0x8051
+#define GL_RGB5                           0x8050
+#define GL_LUMINANCE4                     0x803F
+#define GL_LUMINANCE8                     0x8040
+
 #endif
