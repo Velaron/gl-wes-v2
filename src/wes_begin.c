@@ -1686,3 +1686,24 @@ void glBufferSubDataARB( GLuint target, GLsizei offset, GLsizei size, void *buff
 {
 	glEsImpl->glBufferSubData( target, offset, size, buffer );
 }
+
+void glDebugMessageControlARB( GLenum source, GLenum type, GLenum severity, GLsizei count, const GLuint* ids, GLboolean enabled )
+{
+	glEsImpl->glDebugMessageControlKHR( source, type, severity, count, ids, enabled );
+}
+
+void glDebugMessageInsertARB( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char* buf )
+{
+	glEsImpl->glDebugMessageInsertKHR( source, type, id, severity, length, buf );
+}
+
+void glDebugMessageCallbackARB( GL_DEBUG_PROC_ARB callback, void* userParam )
+{
+	glEsImpl->glDebugMessageCallbackKHR( callback, userParam );
+}
+
+GLuint glGetDebugMessageLogARB( GLuint count, GLsizei bufsize, GLenum* sources, GLenum* types, GLuint* ids, GLuint* severities, GLsizei* lengths, char* messageLog )
+{
+	return glEsImpl->glGetDebugMessageLogKHR( count, bufsize, sources, types, ids, severities, lengths, messageLog );
+}
+

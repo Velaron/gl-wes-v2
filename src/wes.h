@@ -73,6 +73,9 @@ typedef struct gles2lib_s gles2lib_t;
 #define S
 #endif
 
+typedef void ( *GL_DEBUG_PROC_KHR )( unsigned int source, unsigned int type, unsigned int id, unsigned int severity, int length, const char* message, void* userParam );
+typedef void ( *GL_DEBUG_PROC_ARB )( unsigned int source, unsigned int type, unsigned int id, unsigned int severity, int length, const char* message, void* userParam );
+
 struct gles2lib_s
 {
      void         (*glActiveTexture)(GLenum texture) S;
@@ -217,6 +220,10 @@ struct gles2lib_s
      void         (*glVertexAttrib4fv)(GLuint indx, const GLfloat* values) S;
      void         (*glVertexAttribPointer)(GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* ptr) S;
      void         (*glViewport)(GLint x, GLint y, GLsizei width, GLsizei height) S;
+     void         (*glDebugMessageControlKHR)( GLenum source, GLenum type, GLenum severity, GLsizei count, const GLuint* ids, GLboolean enabled ) S;
+     void         (*glDebugMessageInsertKHR)( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char* buf ) S;
+     void         (*glDebugMessageCallbackKHR)( GL_DEBUG_PROC_KHR callback, void* userParam ) S;
+     GLuint       (*glGetDebugMessageLogKHR)( GLuint count, GLsizei bufsize, GLenum* sources, GLenum* types, GLuint* ids, GLuint* severities, GLsizei* lengths, char* messageLog ) S;
 };
 
 #if !defined (__WINS__)

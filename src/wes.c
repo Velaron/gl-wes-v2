@@ -184,7 +184,11 @@ const char* glfuncnames[] =
     "glVertexAttrib4f",
     "glVertexAttrib4fv",
     "glVertexAttribPointer",
-    "glViewport"
+    "glViewport",
+	"glDebugMessageControlKHR",
+	"glDebugMessageInsertKHR",
+	"glDebugMessageCallbackKHR",
+	"glGetDebugMessageLogKHR",
 };
 
 #ifdef XASH_SDL
