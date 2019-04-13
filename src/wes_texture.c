@@ -1,5 +1,5 @@
 /*
-gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -39,7 +39,7 @@ typedef struct textureformat_s
 textureformat_t *textureformatlist;
 #endif
 GLvoid
-glTexParameteri (GLenum target, GLenum pname, GLint param)
+GL_MANGLE(glTexParameteri) (GLenum target, GLenum pname, GLint param)
 {
 	if( pname == 0x8191) // GL_GENERATE_MIPMAP
 	{
@@ -62,7 +62,7 @@ glTexParameteri (GLenum target, GLenum pname, GLint param)
 }
 
 GLvoid
-glTexParameterf (GLenum target, GLenum pname, GLfloat param)
+GL_MANGLE(glTexParameterf) (GLenum target, GLenum pname, GLfloat param)
 {
 	if (pname == GL_TEXTURE_BORDER_COLOR)
 		{
@@ -81,9 +81,9 @@ glTexParameterf (GLenum target, GLenum pname, GLfloat param)
 }
 
 GLvoid
-glTexParameterfv(	GLenum target, GLenum pname, const GLfloat *params)
+GL_MANGLE(glTexParameterfv)(	GLenum target, GLenum pname, const GLfloat *params)
 {
-	glTexParameterf(target, pname, params[0]);
+	GL_MANGLE(glTexParameterf)(target, pname, params[0]);
 }
 
 GLvoid
@@ -178,7 +178,7 @@ void wes_deletetextureformat()
 #endif
 
 GLvoid
-glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height,
+GL_MANGLE(glTexImage2D)(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height,
 		   GLint border, GLenum format, GLenum type, const GLvoid *pixels)
 {
 	//wes_vertbuffer_flush(); //?
@@ -232,7 +232,7 @@ glTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLsizei width, G
 }
 
 
-GLvoid glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+GLvoid GL_MANGLE(glTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
 {
 	wes_gl->glTexSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
 
@@ -244,28 +244,28 @@ GLvoid glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
 }
 
 
-void glCopyTexImage2D( GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border )
+void GL_MANGLE(glCopyTexImage2D)( GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border )
 {
 	wes_gl->glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
 }
 
 
-GLvoid glTexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+GLvoid GL_MANGLE(glTexImage1D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
 {
-    glTexImage2D(GL_TEXTURE_2D, level, internalformat,  width, 1, border, format, type, pixels);
+    GL_MANGLE(glTexImage2D)(GL_TEXTURE_2D, level, internalformat,  width, 1, border, format, type, pixels);
 }
 
-GLvoid glTexImage3D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+GLvoid GL_MANGLE(glTexImage3D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
 {
-    glTexImage2D(GL_TEXTURE_2D, level, internalformat,  width, height, border, format, type, pixels);
+    GL_MANGLE(glTexImage2D)(GL_TEXTURE_2D, level, internalformat,  width, height, border, format, type, pixels);
 }
 
-GLvoid glTexSubImage1D( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels )
+GLvoid GL_MANGLE(glTexSubImage1D)( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels )
 {
     wes_gl->glTexSubImage2D(target,level,xoffset,0,width,1,format,type,pixels);
 }
 
-GLvoid glTexSubImage3D( GLenum target, GLint level,
+GLvoid GL_MANGLE(glTexSubImage3D)( GLenum target, GLint level,
                                          GLint xoffset, GLint yoffset,
                                          GLint zoffset, GLsizei width,
                                          GLsizei height, GLsizei depth,
@@ -312,7 +312,7 @@ gluBuild2DMipmaps(GLenum target, GLint components, GLsizei width, GLsizei height
         return;
     }
 
-    glTexImage2D(target, 0, format, width, height, 0, format, type, pixels);
+    GL_MANGLE(glTexImage2D)(target, 0, format, width, height, 0, format, type, pixels);
 
     data = (char*) malloc(width * height * byteperpixel);
     memcpy(data, pixels, width * height * byteperpixel);
@@ -323,7 +323,7 @@ gluBuild2DMipmaps(GLenum target, GLint components, GLsizei width, GLsizei height
         if (height == 0) height = 1;
         newdata = (char*) malloc(width * height * byteperpixel);
         wes_halveimage(width, height, byteperpixel, data, newdata);
-        glTexImage2D(target, i++, format, width, height, 0, format, type, newdata);
+	GL_MANGLE(glTexImage2D)(target, i++, format, width, height, 0, format, type, newdata);
         free(data);
         data = newdata;
     }

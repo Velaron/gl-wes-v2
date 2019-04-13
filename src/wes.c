@@ -1,5 +1,5 @@
 /*
-gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -263,7 +263,7 @@ wes_destroy()
 
 
 GLvoid
-glMultiDrawArrays(GLenum mode, GLint *first, GLsizei *count, GLsizei primcount)
+GL_MANGLE(glMultiDrawArrays)(GLenum mode, GLint *first, GLsizei *count, GLsizei primcount)
 {
     wes_vertbuffer_flush();
     GLuint i;
@@ -275,7 +275,7 @@ glMultiDrawArrays(GLenum mode, GLint *first, GLsizei *count, GLsizei primcount)
 }
 
 GLvoid
-glMultiDrawElements(GLenum mode, GLsizei *count, GLenum type, GLvoid **indices, GLsizei primcount)
+GL_MANGLE(glMultiDrawElements)(GLenum mode, GLsizei *count, GLenum type, GLvoid **indices, GLsizei primcount)
 {
     wes_vertbuffer_flush();
 
@@ -288,7 +288,7 @@ glMultiDrawElements(GLenum mode, GLsizei *count, GLenum type, GLvoid **indices, 
 }
 
 GLvoid
-glScissor (GLint x, GLint y, GLsizei width, GLsizei height)
+GL_MANGLE(glScissor)(GLint x, GLint y, GLsizei width, GLsizei height)
 {
 	wes_gl->glScissor(x, y, width, height);
 }

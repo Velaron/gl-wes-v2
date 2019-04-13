@@ -15,6 +15,7 @@ def configure(conf):
 	# stub
 	conf.load('sdl2')
 	conf.env.append_unique('DEFINES', 'XASH_SDL')
+	conf.env.append_unique('DEFINES', 'WES_MANGLE_PREPEND')
 	return
 
 def build(bld):

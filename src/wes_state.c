@@ -1,5 +1,5 @@
 /*
-gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -777,7 +777,7 @@ GLboolean wes_getstate (GLenum e)
 
 
 GLvoid
-glLightf(GLenum light, GLenum pname, GLfloat params)
+GL_MANGLE(glLightf)(GLenum light, GLenum pname, GLfloat params)
 {
     wes_vertbuffer_flush();
 
@@ -799,7 +799,7 @@ glLightf(GLenum light, GLenum pname, GLfloat params)
 }
 
 GLvoid
-glLightfv(GLenum light, GLenum pname, GLfloat *params)
+GL_MANGLE(glLightfv)(GLenum light, GLenum pname, GLfloat *params)
 {
     wes_vertbuffer_flush();
 
@@ -844,7 +844,7 @@ glLightfv(GLenum light, GLenum pname, GLfloat *params)
 }
 
 GLvoid
-glMaterialf(GLenum face, GLenum pname, GLfloat params)
+GL_MANGLE(glMaterialf)(GLenum face, GLenum pname, GLfloat params)
 {
     wes_vertbuffer_flush();
 
@@ -867,7 +867,7 @@ glMaterialf(GLenum face, GLenum pname, GLfloat params)
 }
 
 GLvoid
-glMaterialfv(GLenum face, GLenum pname, GLfloat *params)
+GL_MANGLE(glMaterialfv)(GLenum face, GLenum pname, GLfloat *params)
 {
     wes_vertbuffer_flush();
 
@@ -950,7 +950,7 @@ glMaterialfv(GLenum face, GLenum pname, GLfloat *params)
 
 
 GLvoid
-glLightModelfv(GLenum pname, GLfloat* params)
+GL_MANGLE(glLightModelfv)(GLenum pname, GLfloat* params)
 {
     wes_vertbuffer_flush();
 
@@ -962,7 +962,7 @@ glLightModelfv(GLenum pname, GLfloat* params)
 }
 
 GLvoid
-glLightModeli(GLenum pname, GLint params)
+GL_MANGLE(glLightModeli)(GLenum pname, GLint params)
 {
     wes_vertbuffer_flush();
 
@@ -978,7 +978,7 @@ glLightModeli(GLenum pname, GLint params)
 }
 
 GLvoid
-glColorMaterial(GLenum face, GLenum mode)
+GL_MANGLE(glColorMaterial)(GLenum face, GLenum mode)
 {
     wes_vertbuffer_flush();
 
@@ -997,25 +997,25 @@ glColorMaterial(GLenum face, GLenum mode)
 }
 
 GLvoid
-glEnable(GLenum e)
+GL_MANGLE(glEnable)(GLenum e)
 {
     wes_setstate(e, GL_TRUE);
 }
 
 GLvoid
-glDisable(GLenum e)
+GL_MANGLE(glDisable)(GLenum e)
 {
     wes_setstate(e, GL_FALSE);
 }
 
 GLboolean
-glIsEnabled(GLenum e)
+GL_MANGLE(glIsEnabled)(GLenum e)
 {
 	return wes_getstate(e);
 }
 
 GLvoid
-glAlphaFunc(GLenum func, GLclampf ref)
+GL_MANGLE(glAlphaFunc)(GLenum func, GLclampf ref)
 {
     wes_vertbuffer_flush();
 
@@ -1040,7 +1040,7 @@ glAlphaFunc(GLenum func, GLclampf ref)
 }
 
 GLvoid
-glFogi(GLenum pname, GLint param)
+GL_MANGLE(glFogi)(GLenum pname, GLint param)
 {
     wes_vertbuffer_flush();
 
@@ -1062,7 +1062,7 @@ glFogi(GLenum pname, GLint param)
 }
 
 GLvoid
-glFogf(GLenum pname, GLfloat param)
+GL_MANGLE(glFogf)(GLenum pname, GLfloat param)
 {
     wes_vertbuffer_flush();
 
@@ -1078,7 +1078,7 @@ glFogf(GLenum pname, GLfloat param)
 }
 
 GLvoid
-glFogfv(GLenum pname, GLfloat *param)
+GL_MANGLE(glFogfv)(GLenum pname, GLfloat *param)
 {
     wes_vertbuffer_flush();
 
@@ -1090,7 +1090,7 @@ glFogfv(GLenum pname, GLfloat *param)
 }
 
 GLvoid
-glTexGeni(GLenum coord, GLenum pname, GLint param)
+GL_MANGLE(glTexGeni)(GLenum coord, GLenum pname, GLint param)
 {
 
     wes_vertbuffer_flush();
@@ -1105,7 +1105,7 @@ glTexGeni(GLenum coord, GLenum pname, GLint param)
 }
 
 GLvoid
-glTexGenfv(GLenum coord, GLenum pname, GLfloat* param)
+GL_MANGLE(glTexGenfv)(GLenum coord, GLenum pname, GLfloat* param)
 {
     wes_vertbuffer_flush();
 
@@ -1118,7 +1118,7 @@ glTexGenfv(GLenum coord, GLenum pname, GLfloat* param)
 }
 
 GLvoid
-glActiveTexture(GLenum texture)
+GL_MANGLE(glActiveTexture)(GLenum texture)
 {
     //wes_vertbuffer_flush(); ?
 
@@ -1127,7 +1127,7 @@ glActiveTexture(GLenum texture)
 }
 
 GLvoid
-glTexEnvi(GLenum target, GLenum pname, GLint param)
+GL_MANGLE(glTexEnvi)(GLenum target, GLenum pname, GLint param)
 {
 	if (pname != GL_TEXTURE_ENV_MODE)
 		wes_vertbuffer_flush();
@@ -1214,13 +1214,13 @@ glTexEnvi(GLenum target, GLenum pname, GLint param)
     }
 }
 
-GLvoid glTexEnvf (GLenum target, GLenum pname, GLfloat param)
+GLvoid GL_MANGLE(glTexEnvf) (GLenum target, GLenum pname, GLfloat param)
 {
-	glTexEnvi( target, pname, param );
+	GL_MANGLE(glTexEnvi)( target, pname, param );
 }
 
 GLvoid
-glTexEnvfv(GLenum target, GLenum pname, GLfloat *param)
+GL_MANGLE(glTexEnvfv)(GLenum target, GLenum pname, GLfloat *param)
 {
     wes_vertbuffer_flush();
 
@@ -1235,7 +1235,7 @@ glTexEnvfv(GLenum target, GLenum pname, GLfloat *param)
 }
 
 GLvoid
-glClipPlane(GLenum plane, const GLdouble *equation)
+GL_MANGLE(glClipPlane)(GLenum plane, const GLdouble *equation)
 {
     wes_vertbuffer_flush();
 
@@ -1246,7 +1246,7 @@ glClipPlane(GLenum plane, const GLdouble *equation)
 }
 
 GLvoid
-glGetClipPlane(GLenum plane, GLdouble *equation)
+GL_MANGLE(glGetClipPlane)(GLenum plane, GLdouble *equation)
 {
     GLint ind = plane - GL_CLIP_PLANE0;
     equation[0] = u_uniform.uClipPlane[ind].v[0];

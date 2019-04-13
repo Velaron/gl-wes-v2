@@ -1,5 +1,5 @@
 /*
-gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
@@ -570,7 +570,7 @@ wes_matrix_update()
 
 /* opengl api   */
 GLvoid
-glUniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, GLfloat* value)
+GL_MANGLE(glUniformMatrix2fv)(GLint location, GLsizei count, GLboolean transpose, GLfloat* value)
 {
     wes_vertbuffer_flush();
 
@@ -584,7 +584,7 @@ glUniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, GLfloat* 
 }
 
 GLvoid
-glUniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, GLfloat* value)
+GL_MANGLE(glUniformMatrix3fv)(GLint location, GLsizei count, GLboolean transpose, GLfloat* value)
 {
     wes_vertbuffer_flush();
 
@@ -598,7 +598,7 @@ glUniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, GLfloat* 
 }
 
 GLvoid
-glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, GLfloat* value)
+GL_MANGLE(glUniformMatrix4fv)(GLint location, GLsizei count, GLboolean transpose, GLfloat* value)
 {
     wes_vertbuffer_flush();
 
@@ -612,7 +612,7 @@ glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, GLfloat* 
 }
 
 GLvoid
-glMatrixMode(GLenum mode)
+GL_MANGLE(glMatrixMode)(GLenum mode)
 {
 
 	if (m_mode == mode)
@@ -633,7 +633,7 @@ glMatrixMode(GLenum mode)
 }
 
 GLvoid
-glLoadMatrixf(GLfloat *m)
+GL_MANGLE(glLoadMatrixf)(GLfloat *m)
 {
     wes_vertbuffer_flush();
 
@@ -644,7 +644,7 @@ glLoadMatrixf(GLfloat *m)
 }
 
 GLvoid
-glLoadMatrixTransposef(GLfloat *m)
+GL_MANGLE(glLoadMatrixTransposef)(GLfloat *m)
 {
     wes_vertbuffer_flush();
 
@@ -655,7 +655,7 @@ glLoadMatrixTransposef(GLfloat *m)
 }
 
 GLvoid
-glMultMatrixf(GLfloat *m)
+GL_MANGLE(glMultMatrixf)(GLfloat *m)
 {
     wes_vertbuffer_flush();
 
@@ -671,18 +671,18 @@ glMultMatrixf(GLfloat *m)
 }
 
 GLvoid
-glMultMatrixTransposef(GLfloat *m)
+GL_MANGLE(glMultMatrixTransposef)(GLfloat *m)
 {
     wes_vertbuffer_flush();
 
     GLfloat tmp[16];
     wes_transpose4(m, tmp);
-    glMultMatrixf(tmp);
+    GL_MANGLE(glMultMatrixf)(tmp);
 }
 
 
 GLvoid
-glLoadIdentity()
+GL_MANGLE(glLoadIdentity)()
 {
     wes_vertbuffer_flush();
 
@@ -693,7 +693,7 @@ glLoadIdentity()
 
 
 GLvoid
-glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
+GL_MANGLE(glRotatef)(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 {
     wes_vertbuffer_flush();
 
@@ -722,7 +722,7 @@ glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 }
 
 GLvoid
-glTranslatef(GLfloat x, GLfloat y, GLfloat z)
+GL_MANGLE(glTranslatef)(GLfloat x, GLfloat y, GLfloat z)
 {
     wes_vertbuffer_flush();
 
@@ -756,7 +756,7 @@ glTranslatef(GLfloat x, GLfloat y, GLfloat z)
 }
 
 GLvoid
-glScalef(GLfloat x, GLfloat y, GLfloat z)
+GL_MANGLE(glScalef)(GLfloat x, GLfloat y, GLfloat z)
 {
     wes_vertbuffer_flush();
 
@@ -776,7 +776,7 @@ glScalef(GLfloat x, GLfloat y, GLfloat z)
 }
 
 GLvoid
-glFrustrumf(float l, float r, float b, float t, float n, float f)
+GL_MANGLE(glFrustrumf)(float l, float r, float b, float t, float n, float f)
 {
     wes_vertbuffer_flush();
 
@@ -839,7 +839,7 @@ glFrustrumf(float l, float r, float b, float t, float n, float f)
 }
 
 GLvoid
-glOrthof(float l, float r, float b, float t, float n, float f)
+GL_MANGLE(glOrthof)(float l, float r, float b, float t, float n, float f)
 {
     wes_vertbuffer_flush();
 
@@ -874,12 +874,12 @@ glOrthof(float l, float r, float b, float t, float n, float f)
 
 }
 
-GLvoid glOrtho (GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar)
+GLvoid GL_MANGLE(glOrtho) (GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar)
 {
-	glOrthof(left,right,bottom,top, zNear,zFar);
+	GL_MANGLE(glOrthof)(left,right,bottom,top, zNear,zFar);
 }
 GLvoid
-glPushMatrix()
+GL_MANGLE(glPushMatrix)()
 {
     wes_vertbuffer_flush();
 
@@ -930,7 +930,7 @@ glPushMatrix()
 }
 
 GLvoid
-glPopMatrix()
+GL_MANGLE(glPopMatrix)()
 {
     wes_vertbuffer_flush();
 
@@ -987,7 +987,7 @@ gluOrtho2D(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top)
 {
     wes_vertbuffer_flush();
 
-    glOrthof(left, right, bottom, top, -1, 1);
+    GL_MANGLE(glOrthof)(left, right, bottom, top, -1, 1);
 }
 
 GLvoid
@@ -1086,6 +1086,6 @@ gluLookAt(GLfloat eyex, GLfloat eyey, GLfloat eyez,
 	tmp[10] = - forward[0] * m_current->data[2] - forward[1] * m_current->data[6] - forward[2] * m_current->data[10];
 	tmp[11] = - forward[0] * m_current->data[3] - forward[1] * m_current->data[7] - forward[2] * m_current->data[11];
     memcpy(m_current->data, tmp, 12 * sizeof(GLfloat));
-    glTranslatef(-eyex, -eyey, -eyez);
+    GL_MANGLE(glTranslatef)(-eyex, -eyey, -eyez);
 }
 

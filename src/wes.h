@@ -25,12 +25,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __WES_H__
 #define __WES_H__
 
-#define     WES_OGLESV2_FUNCTIONCOUNT   141
+#define     WES_OGLESV2_FUNCTIONCOUNT   145
 
 #define WES_LIGHT_NUM           8
 #define WES_CLIPPLANE_NUM       6
 #define WES_MULTITEX_NUM        4
 #define WES_FACE_NUM            2
+
+#ifdef WES_MANGLE_PREPEND
+#define GL_MANGLE( x ) p##x
+#else
+#define GL_MANGLE( x ) x
+#endif
 
 #define LOG_TAG "gl-wes-v2"
 

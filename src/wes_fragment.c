@@ -1,5 +1,5 @@
 /*
-gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
+GL_MANGLE(gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper
 Contact:    lachlan.ts@gmail.com
 Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus
 
