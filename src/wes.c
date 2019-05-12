@@ -191,7 +191,9 @@ const char* glfuncnames[] =
 	"glGetDebugMessageLogKHR",
 };
 
-#ifdef XASH_SDL
+#ifdef REF_DLL
+extern void *GL_GetProcAddress( const char *name );
+#elif defined XASH_SDL
 void *SDL_GL_GetProcAddress( const char*);
 #endif
 GLvoid
@@ -209,7 +211,7 @@ wes_init(const char *gles2)
     }
 
 	LOGI("Memory alloc wes_init()");
-#ifndef XASH_SDL
+#if !defined XASH_SDL && !defined REF_DLL
 	wes_libhandle = dlopen(gles2, RTLD_NOW | RTLD_LOCAL);//RTLD_LAZY | RTLD_GLOBAL);
 
 	if (wes_libhandle == NULL)
@@ -222,18 +224,17 @@ wes_init(const char *gles2)
     ptr = (void**) wes_gl;
     for(i = 0; i != WES_OGLESV2_FUNCTIONCOUNT+1; i++)
     {
-#ifdef XASH_SDL
+#ifdef REF_DLL
+		void* pfunc = GL_GetProcAddress(glfuncnames[i]);
+#elif defined XASH_SDL
 		void* pfunc = (void*) SDL_GL_GetProcAddress(glfuncnames[i]);
 #else
 		void* pfunc = (void*) dlsym(wes_libhandle, glfuncnames[i]);
 #endif
         if (pfunc == NULL)
-        {
-            LOGE("Could not find %s in %s", glfuncnames[i], gles2
-            );
-        }
-	else
-	LOGI("Loaded %s", glfuncnames[i]);
+			LOGE("Could not find %s in %s", glfuncnames[i], gles2 );
+		else LOGI("Loaded %s", glfuncnames[i]);
+
         *ptr++ = pfunc;
     }
 
