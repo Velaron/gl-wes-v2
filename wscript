@@ -31,6 +31,5 @@ def build(bld):
 		features = 'c',
 		includes = includes,
 		use      = libs,
-		install_path = bld.env.LIBDIR,
 		subsystem = bld.env.MSVC_SUBSYSTEM
 	)
