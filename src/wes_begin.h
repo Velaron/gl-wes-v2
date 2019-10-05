@@ -79,9 +79,9 @@ typedef struct
 extern wrapState2 wrapglState2;
 
 //function declarations:
-extern GLvoid wes_begin_init();
-extern GLvoid wes_begin_destroy();
-extern GLvoid wes_vertbuffer_flush();
+extern GLvoid wes_begin_init( void );
+extern GLvoid wes_begin_destroy( void );
+extern GLvoid wes_vertbuffer_flush( void );
 
 
 #endif

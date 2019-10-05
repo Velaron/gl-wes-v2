@@ -67,11 +67,11 @@ extern GLboolean    m_modelview_mod;
 extern GLboolean    m_projection_mod;
 
 
-extern GLvoid       wes_matrix_init();
-extern GLvoid       wes_matrix_update();
-extern GLvoid       wes_matrix_destroy();
-extern GLboolean    wes_matrix_mvp();
-extern GLboolean    wes_matrix_normal();
+extern GLvoid       wes_matrix_init( void );
+extern GLvoid       wes_matrix_update( void );
+extern GLvoid       wes_matrix_destroy( void );
+extern GLboolean    wes_matrix_mvp( void );
+extern GLboolean    wes_matrix_normal( void );
 extern GLvoid       wes_matrix_fprintf(FILE *f, matrix4_t *in);
 extern GLvoid       wes_matvec4(matrix4_t *m, GLfloat *v, GLfloat *mv);
 

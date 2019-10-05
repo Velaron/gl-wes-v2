@@ -182,7 +182,7 @@ extern GLenum       u_activetex;
 extern progstate_t  u_progstate;
 
 
-extern GLvoid       wes_state_init();
-extern GLvoid       wes_state_update();
+extern GLvoid       wes_state_init( void );
+extern GLvoid       wes_state_update( void );
 
 #endif

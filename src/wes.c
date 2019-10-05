@@ -255,7 +255,7 @@ wes_init(const char *gles2)
 }
 
 GLvoid
-wes_destroy()
+wes_destroy( void )
 {
     dlclose(wes_libhandle);
     wes_shader_destroy();

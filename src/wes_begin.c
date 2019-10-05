@@ -80,7 +80,7 @@ GLuint ibo_id;
 
 
 GLvoid
-wes_reset()
+wes_reset( void )
 {
     int i;
     vt_mode = 0;
@@ -121,7 +121,7 @@ wes_reset()
 #endif
 
 GLvoid
-wes_vertbuffer_flush()
+wes_vertbuffer_flush( void )
 {
     if (!vt_count){
         return;
@@ -225,7 +225,7 @@ wes_vertbuffer_flush()
 
 
 GLvoid
-wes_begin_init()
+wes_begin_init( void )
 {
     int i;
     vt_clienttex = 0;
@@ -261,7 +261,7 @@ wes_begin_init()
 }
 
 GLvoid
-wes_begin_destroy()
+wes_begin_destroy( void )
 {
 	if( !nano_extensions_string )
 	{
@@ -626,7 +626,7 @@ GL_MANGLE(glSecondaryColor3f)(GLfloat r, GLfloat g, GLfloat b){
 }
 
 GLvoid
-GL_MANGLE(glEnd)()
+GL_MANGLE(glEnd)( void )
 {
 
 if (vt_count < 3)
@@ -805,7 +805,7 @@ rev=0;
 }
 
 
-static inline void wes_validate_pointers()
+static inline void wes_validate_pointers( void )
 {
 	int i;
 	arraysValid = GL_FALSE;
@@ -1281,12 +1281,12 @@ void GL_MANGLE(glDepthFunc) (GLenum func)
 	wes_gl->glDepthFunc( func );
 }
 */
-/*GLvoid GL_MANGLE(glFinish)()
+/*GLvoid GL_MANGLE(glFinish)( void )
 {
 	wes_state_update();
 }
 */
-GLvoid GL_MANGLE(glPolygonMode)()
+GLvoid GL_MANGLE(glPolygonMode)( void )
 {
 
 }
@@ -1367,7 +1367,7 @@ GLvoid GL_MANGLE(glClearColor) (GLclampf red, GLclampf green, GLclampf blue, GLc
 	wes_gl->glClearColor(red,green,blue,alpha);
 }
 
-GLenum GL_MANGLE(glGetError)()
+GLenum GL_MANGLE(glGetError)( void )
 {
 	return wes_gl->glGetError();//GL_NO_ERROR;
 }

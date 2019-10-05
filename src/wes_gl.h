@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /* pass throughs */
 
-extern GLvoid wes_vertbuffer_flush();
+extern GLvoid wes_vertbuffer_flush( void );
 
 //#define glActiveTexture             wes_gl->glActiveTexture
 #define glAttachShader              wes_gl->glAttachShader
@@ -183,7 +183,7 @@ extern GLvoid   glDrawArrays(GLenum mode, GLint off, GLint num);
 /*  Begin / End Paradigm
  */
 extern GLvoid   glBegin(GLenum mode);
-extern GLvoid   glEnd();
+extern GLvoid   glEnd( void );
 
 /*  Vertex Specification            */
 extern GLvoid   glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w);
@@ -240,7 +240,7 @@ extern GLvoid   glLoadMatrixf(GLfloat *m);
 extern GLvoid   glLoadMatrixTransposef(GLfloat *m);
 extern GLvoid   glMultMatrixf(GLfloat *m);
 extern GLvoid   glMultMatrixTransposef(GLfloat *m);
-extern GLvoid   glLoadIdentity();
+extern GLvoid   glLoadIdentity( void );
 extern GLvoid   glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
 #define         glRotated(angle, x, y, z)   glRotatef((GLfloat)angle, (GLfloat)x, (GLfloat)y, (GLfloat)z)
 extern GLvoid   glScalef(GLfloat x, GLfloat y, GLfloat z);
@@ -252,8 +252,8 @@ extern GLvoid   glFrustrumf(GLfloat l, GLfloat r, GLfloat b, GLfloat t, GLfloat 
 extern GLvoid   glOrthof(GLfloat l, GLfloat r, GLfloat b, GLfloat t, GLfloat n, GLfloat f);
 //#define         glOrtho(l,r,b,t,n,f)        glOrthof((GLfloat)l,(GLfloat)r,(GLfloat)b,(GLfloat)t,(GLfloat)n,(GLfloat)f)
 extern GLvoid   glActiveTexture(GLenum texture);
-extern GLvoid   glPushMatrix();
-extern GLvoid   glPopMatrix();
+extern GLvoid   glPushMatrix( void );
+extern GLvoid   glPopMatrix( void );
 extern GLvoid   glTexGeni(GLenum coord, GLenum pname, GLint param);
 extern GLvoid   glTexGenfv(GLenum coord, GLenum pname, GLfloat *param);
 

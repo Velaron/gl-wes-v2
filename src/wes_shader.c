@@ -721,7 +721,7 @@ wes_choose_program(progstate_t *s)
 }
 
 GLvoid
-wes_shader_init()
+wes_shader_init( void )
 {
     FILE*           file;
     unsigned int    size;
@@ -790,7 +790,7 @@ wes_shader_init()
 
 
 GLvoid
-wes_shader_destroy()
+wes_shader_destroy( void )
 {
     unsigned int i;
     wes_gl->glDeleteShader(sh_vertex);

@@ -180,8 +180,8 @@ extern GLboolean    sh_program_mod;
 extern GLuint        sh_vertex;
 extern GLboolean	sh_fallback;
 
-extern GLvoid       wes_shader_init();
-extern GLvoid       wes_shader_destroy();
+extern GLvoid       wes_shader_init( void );
+extern GLvoid       wes_shader_destroy( void );
 extern GLvoid       wes_choose_program(progstate_t *s);
 extern GLvoid       wes_bind_program(program_t *p);
 
