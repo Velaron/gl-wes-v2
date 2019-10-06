@@ -680,12 +680,12 @@ switch (vt_mode)
 */
 
 		int rev = 0;
+		int i;
+		int num = (vt_count-vt_mark) - 3;
 		vt_ibuffer[vt_vertcount++] = vt_indexcount++;
 		vt_ibuffer[vt_vertcount++] = vt_indexcount++;
 		vt_ibuffer[vt_vertcount++] = vt_indexcount++;
 
-		int i;
-		int num = (vt_count-vt_mark) - 3;
 		for(i = 0; i < num; i += 1)
 		{
 if (!rev)
@@ -775,13 +775,13 @@ rev=0;
         case GL_POLYGON:
         case GL_TRIANGLE_FAN:
             {
+		int i;
+		int num = (vt_count-vt_mark) - 3;
 		vt_indexbase = vt_indexcount;
 		vt_ibuffer[vt_vertcount++] = vt_indexcount++;
 		vt_ibuffer[vt_vertcount++] = vt_indexcount++;
 		vt_ibuffer[vt_vertcount++] = vt_indexcount++;
 
-		int i;
-		int num = (vt_count-vt_mark) - 3;
 
 		for(i = 0; i < num; i += 1)
 		{
@@ -1033,15 +1033,13 @@ GL_MANGLE(glInterleavedArrays)(GLenum format, GLsizei stride, const GLvoid *poin
 {
     GLint et, ec, en, st, sc, sv, tc, pc, pn, pv, s;
     GLint str;
+    GLint f = sizeof(GLfloat);
+    GLint c = 4 * sizeof(GLubyte);
 
     et = ec = en = GL_FALSE;
     st = sc = sv = 0;
     tc = GL_FLOAT;
     pc = pn = pv = s = 0;
-
-
-    GLint f = sizeof(GLfloat);
-    GLint c = 4 * sizeof(GLubyte);
 
     switch(format)
     {
@@ -1407,7 +1405,7 @@ const GLubyte* GL_MANGLE(glGetString) (GLenum name)
 	{
 		if( !nano_extensions_string )
 		{
-			GLubyte *extstr = wes_gl->glGetString( name );
+			const GLubyte *extstr = wes_gl->glGetString( name );
 			size_t len = strlen( extstr ) + strlen( EXT_STRING ) + 2;
 			nano_extensions_string = malloc( len * sizeof( GLubyte ));
 

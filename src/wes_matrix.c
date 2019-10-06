@@ -482,7 +482,7 @@ wes_matvec4(matrix4_t *m, GLfloat *v, GLfloat *mv)
 }
 
 GLvoid
-wes_matrix_init()
+wes_matrix_init( void )
 {
     int i;
     for(i = 0; i < WES_MODELVIEW_NUM; i++){
@@ -541,7 +541,7 @@ wes_matrix_fprintf(FILE* f, matrix4_t *in)
 }
 
 GLboolean
-wes_matrix_normal()
+wes_matrix_normal( void )
 {
     if (m_modelview_mod){
         wes_normal_matrix(m_modelview, m_modelview_normal);
@@ -552,7 +552,7 @@ wes_matrix_normal()
 }
 
 GLboolean
-wes_matrix_mvp()
+wes_matrix_mvp( void )
 {
     if (m_modelview_mod || m_projection_mod){
         wes_mul4(m_modelview, m_projection, m_modelview_proj);
@@ -563,7 +563,7 @@ wes_matrix_mvp()
 }
 
 GLvoid
-wes_matrix_update()
+wes_matrix_update( void )
 {
     m_modelview_mod = m_projection_mod = 0;
 }
@@ -657,9 +657,9 @@ GL_MANGLE(glLoadMatrixTransposef)(GLfloat *m)
 GLvoid
 GL_MANGLE(glMultMatrixf)(GLfloat *m)
 {
-    wes_vertbuffer_flush();
-
     matrix4_t   mat_m[1], mat_r[1];
+
+    wes_vertbuffer_flush();
 
     m_modelview_mod |= (m_mode == GL_MODELVIEW);
     m_projection_mod |= (m_mode == GL_PROJECTION);
@@ -673,16 +673,16 @@ GL_MANGLE(glMultMatrixf)(GLfloat *m)
 GLvoid
 GL_MANGLE(glMultMatrixTransposef)(GLfloat *m)
 {
+    GLfloat tmp[16];
     wes_vertbuffer_flush();
 
-    GLfloat tmp[16];
     wes_transpose4(m, tmp);
     GL_MANGLE(glMultMatrixf)(tmp);
 }
 
 
 GLvoid
-GL_MANGLE(glLoadIdentity)()
+GL_MANGLE(glLoadIdentity)( void )
 {
     wes_vertbuffer_flush();
 
@@ -778,10 +778,10 @@ GL_MANGLE(glScalef)(GLfloat x, GLfloat y, GLfloat z)
 GLvoid
 GL_MANGLE(glFrustrumf)(float l, float r, float b, float t, float n, float f)
 {
-    wes_vertbuffer_flush();
-
     GLfloat m0, m5, m8, m9, m10, m14;
     GLfloat mc8, mc9, mc10, mc11;
+
+    wes_vertbuffer_flush();
 
     m_modelview_mod |= (m_mode == GL_MODELVIEW);
     m_projection_mod |= (m_mode == GL_PROJECTION);
@@ -841,14 +841,14 @@ GL_MANGLE(glFrustrumf)(float l, float r, float b, float t, float n, float f)
 GLvoid
 GL_MANGLE(glOrthof)(float l, float r, float b, float t, float n, float f)
 {
-    wes_vertbuffer_flush();
-
     GLfloat m0  = 2 / (r - l);
     GLfloat m5  = 2 / (t - b);
     GLfloat m10 = - 2 / (f - n);
     GLfloat m12 = - (r + l) / (r - l);
     GLfloat m13 = - (t + b) / (t - b);
     GLfloat m14 = - (f + n) / (f - n);
+
+    wes_vertbuffer_flush();
 
     m_modelview_mod |= (m_mode == GL_MODELVIEW);
     m_projection_mod |= (m_mode == GL_PROJECTION);
@@ -879,11 +879,11 @@ GLvoid GL_MANGLE(glOrtho) (GLdouble left, GLdouble right, GLdouble bottom, GLdou
 	GL_MANGLE(glOrthof)(left,right,bottom,top, zNear,zFar);
 }
 GLvoid
-GL_MANGLE(glPushMatrix)()
+GL_MANGLE(glPushMatrix)( void )
 {
+    unsigned int i;
     wes_vertbuffer_flush();
 
-    unsigned int i;
     m_modelview_mod |= (m_mode == GL_MODELVIEW);
     m_projection_mod |= (m_mode == GL_PROJECTION);
     switch(m_mode)
@@ -930,11 +930,11 @@ GL_MANGLE(glPushMatrix)()
 }
 
 GLvoid
-GL_MANGLE(glPopMatrix)()
+GL_MANGLE(glPopMatrix)( void )
 {
+    unsigned int i;
     wes_vertbuffer_flush();
 
-    unsigned int i;
     m_modelview_mod |= (m_mode == GL_MODELVIEW);
     m_projection_mod |= (m_mode == GL_PROJECTION);
     switch(m_mode)
@@ -994,7 +994,7 @@ GLvoid
 gluPerspective(GLfloat fovy, GLfloat aspect, GLfloat znear, GLfloat zfar)
 {
 
-    GLfloat rad = fovy * M_PI / 360;
+    GLfloat rad = fovy * (float)M_PI / 360.0f;
     GLfloat sine, cot, dz, idz;
     GLfloat m0, m10, m14;
     GLfloat tmp[4];

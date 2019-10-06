@@ -568,6 +568,7 @@ GLvoid
 wes_frag_build(char* buff, progstate_t *s)
 {
     char *str = buff;
+    int i;
     str += sprintf(str, "%s", frag_header);
     str += wes_frag_tex(str, s);
     str += wes_frag_fog(str, s);
@@ -576,7 +577,6 @@ wes_frag_build(char* buff, progstate_t *s)
     str += sprintf(str, "}\n");
 
 #ifdef WES_PRINT_SHADER
-    int i;
     fprintf(stdout, "===== Fragment Shader =====\n");
     for(i = 0; i < WES_MULTITEX_NUM; i++){
         if (s->uTexture[i].Enable){

@@ -209,7 +209,7 @@ static wrapState wrapglInitState =
     }; 
 
 GLvoid
-wes_state_update()
+wes_state_update( void )
 {
 
     int i;
@@ -296,7 +296,7 @@ wes_state_update()
     sh_program_mod = GL_FALSE;
 }
 
-GLvoid wes_state_init()
+GLvoid wes_state_init( void )
 {
     int i;
 
@@ -779,9 +779,9 @@ GLboolean wes_getstate (GLenum e)
 GLvoid
 GL_MANGLE(glLightf)(GLenum light, GLenum pname, GLfloat params)
 {
+    GLuint ind = light - GL_LIGHT0;
     wes_vertbuffer_flush();
 
-    GLuint ind = light - GL_LIGHT0;
     switch(pname){
         case GL_SPOT_EXPONENT:
             SetUniformIndex(uLight[ind].SpotVar, 0, params);   break;
@@ -801,9 +801,9 @@ GL_MANGLE(glLightf)(GLenum light, GLenum pname, GLfloat params)
 GLvoid
 GL_MANGLE(glLightfv)(GLenum light, GLenum pname, GLfloat *params)
 {
-    wes_vertbuffer_flush();
+   GLuint ind = light - GL_LIGHT0;
+   wes_vertbuffer_flush();
 
-    GLuint ind = light - GL_LIGHT0;
     switch(pname)
     {
         case GL_AMBIENT:
@@ -980,9 +980,9 @@ GL_MANGLE(glLightModeli)(GLenum pname, GLint params)
 GLvoid
 GL_MANGLE(glColorMaterial)(GLenum face, GLenum mode)
 {
+    GLint ind = (face == GL_FRONT) ? 0 : 1;
     wes_vertbuffer_flush();
 
-    GLint ind = (face == GL_FRONT) ? 0 : 1;
     if (mode == GL_AMBIENT){
         SetUniform1i(uMaterial[ind].ColorMaterial, 0);
     } else if (mode == GL_DIFFUSE){
@@ -1237,9 +1237,9 @@ GL_MANGLE(glTexEnvfv)(GLenum target, GLenum pname, GLfloat *param)
 GLvoid
 GL_MANGLE(glClipPlane)(GLenum plane, const GLdouble *equation)
 {
+    GLint ind = plane - GL_CLIP_PLANE0;
     wes_vertbuffer_flush();
 
-    GLint ind = plane - GL_CLIP_PLANE0;
     SetUniform4f(uClipPlane[ind], (GLfloat)equation[0], (GLfloat)equation[1],
                                   (GLfloat)equation[2], (GLfloat)equation[3]);
 

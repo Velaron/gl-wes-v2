@@ -266,8 +266,8 @@ wes_destroy( void )
 GLvoid
 GL_MANGLE(glMultiDrawArrays)(GLenum mode, GLint *first, GLsizei *count, GLsizei primcount)
 {
-    wes_vertbuffer_flush();
     GLuint i;
+    wes_vertbuffer_flush();
     for (i = 0; i < (unsigned)primcount; i++) {
         if (count[i] > 0){
             wes_gl->glDrawArrays(mode, first[i], count[i]);
@@ -278,9 +278,8 @@ GL_MANGLE(glMultiDrawArrays)(GLenum mode, GLint *first, GLsizei *count, GLsizei 
 GLvoid
 GL_MANGLE(glMultiDrawElements)(GLenum mode, GLsizei *count, GLenum type, GLvoid **indices, GLsizei primcount)
 {
-    wes_vertbuffer_flush();
-
     GLuint i;
+    wes_vertbuffer_flush();
     for (i = 0; i < (unsigned)primcount; i++) {
         if (count[i] > 0){
             wes_gl->glDrawElements(mode, count[i], type, indices[i]);
