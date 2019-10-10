@@ -20,6 +20,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
 #include <math.h>
+#ifdef HAVE_TGMATH_H
+#include <tgmath.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 #include "wes.h"
@@ -42,7 +45,7 @@ GLenum      m_mode;
 GLuint      m_modelview_num, m_projection_num, m_texture_num, m_color_num;
 GLboolean   m_modelview_mod, m_projection_mod;
 
-#define M_DEGTORAD    (M_PI / 180.0f)
+#define M_DEGTORAD    ((float)M_PI / 180.0f)
 
 /* internal functions   */
 GLvoid
@@ -58,7 +61,7 @@ wes_classify(matrix4_t *in)
 {
     in->flags = 0;
 
-    if (in->data[3] != 0 || in->data[7] != 0 || in->data[11] != 0 || in->data[15] != 1.0){
+    if (in->data[3] != 0 || in->data[7] != 0 || in->data[11] != 0 || in->data[15] != 1.0f){
         in->flags = WES_M_DIRTY;
         return;
     }
@@ -66,7 +69,7 @@ wes_classify(matrix4_t *in)
     if (in->data[1] == 0 && in->data[2] == 0 && in->data[4] == 0 &&
         in->data[6] == 0 && in->data[8] == 0 && in->data[9] == 0){
 
-        if (in->data[0] == 1.0 && in->data[5] == 1.0 && in->data[10] == 1.0){
+	  if (in->data[0] == 1.0f && in->data[5] == 1.0f && in->data[10] == 1.0f){
             in->flags = WES_M_IDENTITY;
         } else {
             in->flags = WES_M_SCALED;
@@ -110,7 +113,7 @@ normalize3(GLfloat *v)
 {
     GLfloat r;
     r = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-    if (r == 0.0) return;
+    if (r == 0.0f) return;
     r = sqrt(r);
     v[0] /= r;
     v[1] /= r;
@@ -197,7 +200,7 @@ wes_rotate_xyz(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
     xx = x * x; yy = y * y; zz = z * z;
     xy = x * y; yz = y * z; zx = z * x;
     xs = x * s; ys = y * s; zs = z * s;
-    one_c = 1.0 - c;
+    one_c = 1.0f - c;
 
     m0 = (one_c * xx) + c;
     m1 = (one_c * xy) + zs;
@@ -422,7 +425,7 @@ wes_normal_matrix(matrix4_t *in, matrix3_t *out)
         float det;
 
         det = out->data[0*3+0] * out->data[1*3+1] - out->data[0*3+1] * out->data[1*3+0];
-        if (det == 0.0) {
+	  if (det == 0.0f) {
             return;
         }
 
@@ -437,7 +440,7 @@ wes_normal_matrix(matrix4_t *in, matrix3_t *out)
         r2[0] = r1[0] * out->data[2*3+0] + r1[1] * out->data[2*3+1];
         r3 = r2[0] - out->data[2*3+2];
 
-        if (r3 == 0.0) {
+	  if (r3 == 0.0f) {
             return;
         }
 
