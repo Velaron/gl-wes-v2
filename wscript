@@ -14,8 +14,8 @@ def options(opt):
 def configure(conf):
 	if conf.env.DEST_OS2 == 'android':
 		conf.check_cc(lib='log')
-	conf.env.append_unique('DEFINES', 'WES_MANGLE_PREPEND')
-	conf.env.append_unique('DEFINES', 'REF_DLL')
+	conf.define('WES_MANGLE_PREPEND', 1)
+	conf.define('REF_DLL', 1)
 	return
 
 def build(bld):
@@ -23,7 +23,7 @@ def build(bld):
 	libs = []
 	if bld.env.DEST_OS2 == 'android':
 		libs += ['LOG']
-	includes = [ 'src/' ]
+	includes = ['src/']
 
 	bld.stlib(
 		source   = source,
