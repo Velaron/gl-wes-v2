@@ -115,12 +115,15 @@ struct uint_s{
 };
 
 struct umat2_s{
+	ubool_t ph;
 };
 
 struct umat3_s{
+	ubool_t ph;
 };
 
 struct umat4_s{
+	ubool_t ph;
 };
 
 struct uniforms_s {

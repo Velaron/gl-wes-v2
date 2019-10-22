@@ -29,9 +29,26 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #if defined(_WIN32)
     #include <windows.h>
+#if defined( WINAPI_FAMILY ) && WINAPI_FAMILY_PARTITION( WINAPI_PARTITION_APP )
+static void* dlopen(const char* dllname)
+{
+	wchar_t buffer[MAX_PATH];
+	MultiByteToWideChar(CP_ACP, 0, dllname, -1, buffer, MAX_PATH);
+	return LoadPackagedLibrary(buffer, 0);
+}
+static void dlclose(void* hInstance)
+{
+	FreeLibrary((HMODULE)hInstance);
+}
+static void* dlsym(void* hInstance, const char* name)
+{
+	return GetProcAddress((HMODULE)hInstance, name);
+}
+#else
     #define dlopen(A, B)    LoadLibrary(A)
     #define dlsym(A, B)     GetProcAddress((HINSTANCE__*) A, B)
     #define dlclose(A)      FreeLibrary((HINSTANCE__*) A)
+#endif
 #else
     #define __GNU_SOURCE
     #include <dlfcn.h>
