@@ -29,7 +29,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #if defined(_WIN32)
     #include <windows.h>
-#if defined( WINAPI_FAMILY ) && WINAPI_FAMILY_PARTITION( WINAPI_PARTITION_APP )
+
+#ifdef WINAPI_FAMILY
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+#define XASH_WINRT
+#endif
+#endif
+
+#ifdef XASH_WINRT
 static void* dlopen(const char* dllname)
 {
 	wchar_t buffer[MAX_PATH];
