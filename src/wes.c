@@ -31,26 +31,26 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     #include <windows.h>
 
 #ifdef WINAPI_FAMILY
-#if (!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP))
-#define XASH_WINRT
-#endif
+    #if (!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP))
+        #define XASH_WINRT 1
+    #endif
 #endif
 
 #ifdef XASH_WINRT
-static void* dlopen(const char* dllname)
-{
-	wchar_t buffer[MAX_PATH];
-	MultiByteToWideChar(CP_ACP, 0, dllname, -1, buffer, MAX_PATH);
-	return LoadPackagedLibrary(buffer, 0);
-}
-static void dlclose(void* hInstance)
-{
-	FreeLibrary((HMODULE)hInstance);
-}
-static void* dlsym(void* hInstance, const char* name)
-{
-	return GetProcAddress((HMODULE)hInstance, name);
-}
+    static void* dlopen(const char* dllname, int flags)
+    {
+        wchar_t buffer[MAX_PATH];
+        MultiByteToWideChar(CP_ACP, 0, dllname, -1, buffer, MAX_PATH);
+        return LoadPackagedLibrary(buffer, 0);
+    }
+    static void dlclose(void* hInstance)
+    {
+        FreeLibrary((HMODULE)hInstance);
+    }
+    static void* dlsym(void* hInstance, const char* name)
+    {
+        return GetProcAddress((HMODULE)hInstance, name);
+    }
 #else
     #define dlopen(A, B)    LoadLibrary(A)
     #define dlsym(A, B)     GetProcAddress((HINSTANCE__*) A, B)
