@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define WES_PBUFFER_SIZE    128
 
-char *wesShaderTestStr = "/*\n\
+const char *wesShaderTestStr = "/*\n\
 		gl-wes-v2:  OpenGL 2.0 to OGLESv2.0 wrapper\n\
 		Contact:    lachlan.ts@gmail.com\n\
 		Copyright (C) 2009  Lachlan Tychsen - Smith aka Adventus\n\
@@ -365,7 +365,7 @@ char *wesShaderTestStr = "/*\n\
 ";
 
 GLboolean	sh_fallback;
-char *wesShaderFallbackStr =
+const char *wesShaderFallbackStr =
 	"attribute highp vec4 	aPosition;\n\
 	attribute lowp vec4 	aColor;\n\
 	attribute mediump vec4 	aTexCoord0;\n\
@@ -443,19 +443,16 @@ wes_program_error(GLuint ind)
 }
 
 GLuint
-wes_shader_create(char* data, GLenum type)
+wes_shader_create(const char* data, GLenum type)
 {
     GLuint  index;
     GLint   success;
-
-    char *src[1];
-    src[0] = data;
 
     LOGI("glCreateShader");
     //Compile:
     index = wes_gl->glCreateShader(type);
     LOGI("glCreateShader, index = %d\n", index);
-    wes_gl->glShaderSource(index, 1, (const char**) src, NULL);
+	 wes_gl->glShaderSource(index, 1, &data, NULL);
     LOGI("glShaderSource\n");
     
     wes_gl->glCompileShader(index);
@@ -730,7 +727,6 @@ wes_shader_init( void )
     sh_pbuffer_count = 0;
     sh_program_mod = GL_TRUE;
 
-
 #ifdef SHADER_FILE
     //Load file into mem:
 	file = fopen(SHADER_FILE, "rb");
@@ -757,34 +753,16 @@ wes_shader_init( void )
 	LOGI("after shader create");
     free(data);
 #else
-#define SHADER_COMPUTE_LIGHTING
-#ifdef SHADER_COMPUTE_LIGHTING
-	//data = (char*) malloc(wesShaderLightingStr.size() + 1);
-	//strcpy(data, wesShaderLightingStr.c_str());
-	
 	LOGI("Before shader load");
-	data = (char*) malloc(strlen(wesShaderTestStr) + 1);
-	LOGI("malloc shader load");
-	strcpy(data, wesShaderTestStr);
-	LOGI("strcpy shader load");
-#else
-	data = (char*) malloc(wesShaderStr.size() + 1);
-	strcpy(data, wesShaderStr.c_str());
-#endif
-	//LOGI("Shader = %s", data);
-	sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
+
+	sh_vertex = wes_shader_create(wesShaderTestStr, GL_VERTEX_SHADER);
 	if(sh_vertex == 0xFFFFFFFF)
 	{
-		free(data);
-		data = (char*) malloc(strlen(wesShaderFallbackStr) + 1);
-		strcpy(data, wesShaderFallbackStr);
-		sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
+		sh_vertex = wes_shader_create(wesShaderFallbackStr, GL_VERTEX_SHADER);
 		sh_fallback = GL_TRUE;
 	}
 
 	LOGI("after shader create");
-	free(data);
-	LOGI("free");
 #endif
 }
 
